@@ -1,1 +1,1 @@
-# flex-BE-gateway
+# FLEX-BE-gateway
