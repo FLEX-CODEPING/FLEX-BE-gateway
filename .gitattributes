@@ -1,0 +1,15 @@
+# Spring Boot source code
+*.java text eol=lf
+*.yml text eol=lf
+
+# C and C++ source code
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+
+# visual studio project configuration
+*.sln text eol=lf
+*.vs text eol=lf
+*.csproj eol=lf
+*.props eol=lf
+*.filters eol=lf
