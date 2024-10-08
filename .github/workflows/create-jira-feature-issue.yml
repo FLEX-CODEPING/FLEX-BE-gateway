@@ -13,7 +13,7 @@ jobs:
         id: check_template
         run: |
           BODY="${{ github.event.issue.body }}"
-          if [[ $BODY == *"상위 작업 Ticket Number"* ]]; then
+          if [[ $BODY == *"Feature 상위 작업 Ticket Number"* ]]; then
             echo "is_feature_template=true" >> $GITHUB_OUTPUT
           else
             echo "is_feature_template=false" >> $GITHUB_OUTPUT
