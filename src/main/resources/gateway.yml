@@ -1,0 +1,47 @@
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**, /api/users/**, /api/follow
+          filters:
+            - StripPrefix=2
+        - id: blog-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/blogs/**, /api/posts/**
+          filters:
+            - StripPrefix=2
+        - id: investment-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/investments/**, /api/stocks/**, /api/my-stocks/**, /api/transactions/**
+          filters:
+            - StripPrefix=2
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    gateway:
+      enabled: true
+
+---
+spring.config.activate.on-profile: local
+
+
+---
+spring.config.activate.on-profile: dev
+
+
+
+---
+spring.config.activate.on-profile: prod
