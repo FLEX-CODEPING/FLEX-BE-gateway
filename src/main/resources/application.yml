@@ -4,6 +4,7 @@ spring:
   config:
     import:
       - gateway.yml
+      - swagger.yml
 
 server:
   port: ${APPLICATION_PORT:8080}

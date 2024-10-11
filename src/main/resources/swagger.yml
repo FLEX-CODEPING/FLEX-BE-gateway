@@ -1,0 +1,32 @@
+---
+spring.config.activate.on-profile: local
+
+swagger.server.url: http://localhost:8080
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui.html
+    use-root-path: true
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+    disable-swagger-default-url: true
+    urls:
+      - name: 인증 & 회원서비스
+        url: /api/user-service/v3/api-docs
+      - name: 블로그 서비스
+        url: /api/blog-service/v3/api-docs
+      - name: 모의 투자 서비스
+        url: /api/investment-service/v3/api-docs
+      - name: 주가 종목 서비스
+        url: /api/stock-service/v3/api-docs
+  api-docs:
+    path: /v3/api-docs
+
+---
+spring.config.activate.on-profile: dev
+
+---
+spring.config.activate.on-profile: prod
