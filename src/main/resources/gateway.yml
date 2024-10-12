@@ -1,3 +1,6 @@
+---
+spring.config.activate.on-profile: local
+
 spring:
   main:
     web-application-type: reactive
@@ -9,21 +12,27 @@ spring:
         - id: user-service
           uri: http://localhost:8081
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/follow
-          filters:
-            - StripPrefix=2
+            - Path=/api/auth/**, /api/users/**, /api/follow/**, /api/user-service/**
         - id: blog-service
           uri: http://localhost:8082
           predicates:
-            - Path=/api/blogs/**, /api/posts/**
-          filters:
-            - StripPrefix=2
+            - Path=/api/blogs/**, /api/posts/**, /api/blog-service/**
         - id: investment-service
           uri: http://localhost:8083
           predicates:
-            - Path=/api/investments/**, /api/stocks/**, /api/my-stocks/**, /api/transactions/**
-          filters:
-            - StripPrefix=2
+            - Path=/api/investments/**, /api/investment-service/**
+        - id: stock-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/stocks/**, /api/stock-service/**
+        - id: image-service
+          uri: http://loacalhost:8085
+          predicates:
+            - Path=/api/presigned-url/**, /api/image-service/**
+        - id: ai-news-service
+          uri: http://loacalhost:8086
+          predicates:
+            - Path=/api/news-summary/**, /api/ai-news-service/**
 
 management:
   endpoints:
@@ -35,13 +44,7 @@ management:
       enabled: true
 
 ---
-spring.config.activate.on-profile: local
-
-
----
 spring.config.activate.on-profile: dev
-
-
 
 ---
 spring.config.activate.on-profile: prod
