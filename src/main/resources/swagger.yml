@@ -22,6 +22,10 @@ springdoc:
         url: /api/investment-service/v3/api-docs
       - name: 주가 종목 서비스
         url: /api/stock-service/v3/api-docs
+      - name: 이미지 서비스
+        url: /api/image-service/v3/api-docs
+      - name: AI 뉴스 요약 서비스
+        url: /api/ai-news-service/v3/api-docs
   api-docs:
     path: /v3/api-docs
 
