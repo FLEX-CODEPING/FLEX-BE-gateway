@@ -8,18 +8,18 @@ jobs:
     name: Create Jira issue
     runs-on: ubuntu-latest
     steps:
-      - name: Check if issue uses feature template
+      - name: Check if issue uses bug template
         id: check_template
         run: |
           BODY="${{ github.event.issue.body }}"
           if [[ $BODY == *"Bug 상위 작업 Ticket Number"* ]]; then
-            echo "is_feature_template=true" >> $GITHUB_OUTPUT
+            echo "is_bug_template=true" >> $GITHUB_OUTPUT
           else
-            echo "is_feature_template=false" >> $GITHUB_OUTPUT
+            echo "is_bug_template=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Exit if not feature template
-        if: steps.check_template.outputs.is_feature_template != 'true'
+      - name: Exit if not bug template
+        if: steps.check_template.outputs.is_bug_template != 'true'
         run: exit 0
 
       - name: Login
