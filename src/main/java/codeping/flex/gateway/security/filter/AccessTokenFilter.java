@@ -97,7 +97,8 @@ public class AccessTokenFilter implements GlobalFilter {
                 .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + token)
                 .bodyValue(requestDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {});
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
     }
 
     /**
