@@ -2,7 +2,9 @@ package codeping.flex.gateway.security.filter;
 
 import codeping.flex.gateway.global.common.exception.ApplicationException;
 import codeping.flex.gateway.global.common.response.ApplicationResponse;
+import codeping.flex.gateway.global.common.response.code.BaseErrorCode;
 import codeping.flex.gateway.global.common.response.code.CommonErrorCode;
+import codeping.flex.gateway.global.common.response.code.GatewayErrorCode;
 import codeping.flex.gateway.global.properties.ServerDomainProperties;
 import codeping.flex.gateway.security.jwt.access.AccessTokenValidator;
 import codeping.flex.gateway.security.passport.PassportRequestDto;
@@ -57,10 +59,12 @@ public class AccessTokenFilter implements GlobalFilter {
 
         // 인증이 필요하지 않은 path 는 filter를 거치지 않음
         if (isAnonymousEndpoint(path)) {
+            log.debug("Anonymous endpoint detected, skipping authentication");
             return chain.filter(exchange);
         }
 
         return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
+                .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
                 .flatMap(accessTokenValidator::validateToken)
                 .flatMap(token -> processPassportData(exchange, token, path))
                 .flatMap(chain::filter)
@@ -120,12 +124,13 @@ public class AccessTokenFilter implements GlobalFilter {
      * @return 에러 응답을 포함한 Mono<Void>
      */
     private Mono<Void> handleError(ServerWebExchange exchange, Throwable error) {
+        log.error("Error occurred in AccessTokenFilter: ", error);
         HttpStatus status;
-        CommonErrorCode errorCode;
+        BaseErrorCode errorCode;
 
         if (error instanceof ApplicationException) {
             status = HttpStatus.UNAUTHORIZED;
-            errorCode = CommonErrorCode.UNAUTHORIZED;
+            errorCode = ((ApplicationException) error).getCode();
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
@@ -134,6 +139,13 @@ public class AccessTokenFilter implements GlobalFilter {
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
+        byte[] errorResponse = createErrorResponse(errorCode);
+
+        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+                .bufferFactory().wrap(errorResponse)));
+    }
+
+    private byte[] createErrorResponse(BaseErrorCode errorCode) {
         ApplicationResponse<Object> body = ApplicationResponse.onFailure(errorCode.getCustomCode(), errorCode.getMessage(), null);
 
         byte[] bytes;
@@ -143,8 +155,6 @@ public class AccessTokenFilter implements GlobalFilter {
             log.error("Error while serializing error response", e);
             bytes = errorCode.getMessage().getBytes();
         }
-
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                .bufferFactory().wrap(bytes)));
+        return bytes;
     }
 }
