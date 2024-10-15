@@ -7,7 +7,7 @@ springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
-    path: /swagger-ui.html
+    path: /api/swagger-ui.html
     use-root-path: true
     tags-sorter: alpha
     operations-sorter: method
@@ -27,7 +27,7 @@ springdoc:
       - name: AI 뉴스 요약 서비스
         url: /api/ai-news-service/v3/api-docs
   api-docs:
-    path: /v3/api-docs
+    path: /api/v3/api-docs
 
 ---
 spring.config.activate.on-profile: dev
