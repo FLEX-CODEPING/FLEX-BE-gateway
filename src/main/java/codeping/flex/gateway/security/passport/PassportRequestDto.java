@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record PassportRequestDto(
-        @JsonProperty("passport_id") String id,
+        @JsonProperty("passportId") String id,
         @JsonProperty("destination") String path,
-        @JsonProperty("expiration_time") LocalDateTime expirationTime
+        @JsonProperty("expirationTime") LocalDateTime expirationTime
 ) {
     public static PassportRequestDto of(String path, LocalDateTime expirationTime) {
         return new PassportRequestDto(UUID.randomUUID().toString(), path, expirationTime);
