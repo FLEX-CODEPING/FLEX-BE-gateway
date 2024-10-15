@@ -33,9 +33,6 @@ spring:
           uri: http://loacalhost:8086
           predicates:
             - Path=/api/news-summary/**, /api/ai-news-service/**
-      default-filters:
-        - AccessTokenFilter
-
 management:
   endpoints:
     web:
@@ -78,7 +75,5 @@ spring:
           uri: http://ai-news-service
           predicates:
             - Path=/api/news-summary/**, /api/ai-news-service/**
-      default-filters:
-        - AccessTokenFilter
 ---
 spring.config.activate.on-profile: prod
