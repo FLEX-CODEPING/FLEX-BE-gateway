@@ -1,5 +1,5 @@
 jwt:
-  secret-key: ${JWT_ACCESS_SECRET_KEY:exampleSecretKeyForNamoSystemAccessSecretKeyTestForPadding}
+  secret-key: ${JWT_ACCESS_SECRET_KEY:exampleSecretKeyForFLEXSystemAccessSecretKeyTestForPadding}
   expiration-time:
     access-token: ${JWT_ACCESS_EXPIRATION_TIME:1209600}
     refresh-token: ${JWT_REFRESH_EXPIRATION_TIME:1800}
