@@ -20,6 +20,8 @@ server:
 
 logging:
   level:
+    root: INFO
+    codeping.flex.gateway.security.filter.AccessTokenFilter: TRACE
     org.springframework.cloud.gateway: DEBUG
     org.springframework.web: DEBUG
 
