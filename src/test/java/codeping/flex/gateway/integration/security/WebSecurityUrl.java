@@ -1,4 +1,4 @@
-package codeping.flex.gateway.security.filter;
+package codeping.flex.gateway.integration.security;
 
 public class WebSecurityUrl {
     private WebSecurityUrl() {

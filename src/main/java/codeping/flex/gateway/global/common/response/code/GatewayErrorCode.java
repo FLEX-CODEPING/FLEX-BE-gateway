@@ -1,12 +1,13 @@
 package codeping.flex.gateway.global.common.response.code;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public enum GatewayErrorCode implements BaseErrorCode{
     EMPTY_TOKEN(HttpStatus.FORBIDDEN, "AUTHORIAZTION_001","accees token이 비어있습니다."),
     INVALID_TOKEN(HttpStatus.FORBIDDEN, "AUTHORIAZTION_002","유효하지 않은 토큰입니다."),
@@ -20,16 +21,16 @@ public enum GatewayErrorCode implements BaseErrorCode{
 
     @Override
     public HttpStatus getHttpStatus() {
-        return null;
+        return this.httpStatus;
     }
 
     @Override
     public String getCustomCode() {
-        return "";
+        return this.customCode;
     }
 
     @Override
     public String getMessage() {
-        return "";
+        return this.message;
     }
 }

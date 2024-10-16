@@ -52,7 +52,7 @@ public class AccessTokenValidator implements TokenValidator {
     public Mono<String> validateToken(String token) {
         return Mono.fromCallable(() -> {
                     if(!StringUtils.hasText(token)){
-                        throw new ApplicationException(GatewayErrorCode.EMPTY_TOKEN);
+                        throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
                     }
                     Claims claims = getClaimsFromToken(token);
                     if (isTokenExpired(claims)) {

@@ -2,7 +2,9 @@ package codeping.flex.gateway.security.filter;
 
 import codeping.flex.gateway.global.common.exception.ApplicationException;
 import codeping.flex.gateway.global.common.response.ApplicationResponse;
+import codeping.flex.gateway.global.common.response.code.BaseErrorCode;
 import codeping.flex.gateway.global.common.response.code.CommonErrorCode;
+import codeping.flex.gateway.global.common.response.code.GatewayErrorCode;
 import codeping.flex.gateway.global.properties.ServerDomainProperties;
 import codeping.flex.gateway.security.jwt.access.AccessTokenValidator;
 import codeping.flex.gateway.security.passport.PassportRequestDto;
@@ -30,6 +32,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static codeping.flex.gateway.security.filter.WebSecurityUrl.PASSPORT_ENDPOINT;
 import static codeping.flex.gateway.security.jwt.AuthConstants.PASSPORT_HEADER_PREFIX;
 import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
 
@@ -57,12 +60,14 @@ public class AccessTokenFilter implements GlobalFilter {
 
         // 인증이 필요하지 않은 path 는 filter를 거치지 않음
         if (isAnonymousEndpoint(path)) {
+            log.debug("Anonymous endpoint detected, skipping authentication");
             return chain.filter(exchange);
         }
 
         return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
+                .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
                 .flatMap(accessTokenValidator::validateToken)
-                .flatMap(token -> processPassportData(exchange, token, path))
+                .flatMap(accessToken -> processPassportData(exchange, accessToken, path))
                 .flatMap(chain::filter)
                 .onErrorResume(error -> handleError(exchange, error));
     }
@@ -78,23 +83,25 @@ public class AccessTokenFilter implements GlobalFilter {
                         WebSecurityUrl.ANONYMOUS_ENDPOINTS,
                         WebSecurityUrl.SWAGGER_ENDPOINTS)
                 .flatMap(Arrays::stream)
+                .peek(endpoint -> log.debug("Checking endpoint: {}, Match result: {}", endpoint, pathMatcher.match(endpoint, path)))
                 .anyMatch(endpoint -> pathMatcher.match(endpoint, path));
     }
 
-    private Mono<ServerWebExchange> processPassportData(ServerWebExchange exchange, String token, String path) {
-        return getPassportData(token, PassportRequestDto.of(path, LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)))
+
+    private Mono<ServerWebExchange> processPassportData(ServerWebExchange exchange, String accessToken, String path) {
+        return getPassportData(accessToken, PassportRequestDto.of(path, LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)))
                 .flatMap(passportData -> addPassportHeaders(exchange, passportData));
     }
 
     /**
      * 검증한 토큰에 대한 사용자의 Passport를 발급하여 반환합니다.
-     * @param token Bearer 토큰
+     * @param accessToken Bearer 토큰
      * @return 패스포트 데이터를 포함한 Mono<Map>
      */
-    private Mono<Map<String, String>> getPassportData(String token, PassportRequestDto requestDto) {
+    private Mono<Map<String, String>> getPassportData(String accessToken, PassportRequestDto requestDto) {
         return webClient.post()
-                .uri(serverDomainProperties.getService() + "/api/passport")
-                .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + token)
+                .uri(serverDomainProperties.getService() + PASSPORT_ENDPOINT)
+                .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken)
                 .bodyValue(requestDto)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
@@ -120,12 +127,13 @@ public class AccessTokenFilter implements GlobalFilter {
      * @return 에러 응답을 포함한 Mono<Void>
      */
     private Mono<Void> handleError(ServerWebExchange exchange, Throwable error) {
+        log.error("Error occurred in AccessTokenFilter: ", error);
         HttpStatus status;
-        CommonErrorCode errorCode;
+        BaseErrorCode errorCode;
 
         if (error instanceof ApplicationException) {
             status = HttpStatus.UNAUTHORIZED;
-            errorCode = CommonErrorCode.UNAUTHORIZED;
+            errorCode = ((ApplicationException) error).getCode();
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
@@ -134,6 +142,13 @@ public class AccessTokenFilter implements GlobalFilter {
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
+        byte[] errorResponse = createErrorResponse(errorCode);
+
+        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+                .bufferFactory().wrap(errorResponse)));
+    }
+
+    private byte[] createErrorResponse(BaseErrorCode errorCode) {
         ApplicationResponse<Object> body = ApplicationResponse.onFailure(errorCode.getCustomCode(), errorCode.getMessage(), null);
 
         byte[] bytes;
@@ -143,8 +158,6 @@ public class AccessTokenFilter implements GlobalFilter {
             log.error("Error while serializing error response", e);
             bytes = errorCode.getMessage().getBytes();
         }
-
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                .bufferFactory().wrap(bytes)));
+        return bytes;
     }
 }
