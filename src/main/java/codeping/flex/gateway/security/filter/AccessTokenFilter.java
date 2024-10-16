@@ -83,6 +83,7 @@ public class AccessTokenFilter implements GlobalFilter {
                         WebSecurityUrl.ANONYMOUS_ENDPOINTS,
                         WebSecurityUrl.SWAGGER_ENDPOINTS)
                 .flatMap(Arrays::stream)
+                .peek(endpoint -> log.debug("Checking endpoint: {}, Match result: {}", endpoint, pathMatcher.match(endpoint, path)))
                 .anyMatch(endpoint -> pathMatcher.match(endpoint, path));
     }
 
