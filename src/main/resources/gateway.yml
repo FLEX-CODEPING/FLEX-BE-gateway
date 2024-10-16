@@ -49,30 +49,30 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false
+          enabled: true
       routes:
         - id: user-service
-          uri: http://user-service
+          uri: lb://user-service
           predicates:
             - Path=/api/auth/**, /api/users/**, /api/follow/**, /api/user-service/**
         - id: blog-service
-          uri: http://blog-service
+          uri: lb://blog-service
           predicates:
             - Path=/api/blogs/**, /api/posts/**, /api/blog-service/**
         - id: investment-service
-          uri: http://investment-service
+          uri: lb://investment-service
           predicates:
             - Path=/api/investments/**, /api/investment-service/**
         - id: stock-service
-          uri: http://stock-service
+          uri: lb://stock-service
           predicates:
             - Path=/api/stocks/**, /api/stock-service/**
         - id: image-service
-          uri: http://image-service
+          uri: lb://image-service
           predicates:
             - Path=/api/presigned-url/**, /api/image-service/**
         - id: ai-news-service
-          uri: http://ai-news-service
+          uri: lb://ai-news-service
           predicates:
             - Path=/api/news-summary/**, /api/ai-news-service/**
 ---
