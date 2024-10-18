@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}")
-                    docker.withRegistry('', 'docker-repo-credential') {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-repo-credential') {
                         dockerImage.push()
                     }
                 }
