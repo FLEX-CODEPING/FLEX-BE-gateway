@@ -5,6 +5,28 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('docker-repo-credential')
         K8S_NAMESPACE = 'default'
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
+        GITHUB_TOKEN = credentials('github_access_token')
+    }
+
+    tools {
+            maven 'Maven 3.8.1'
+        }
+
+    triggers {
+        genericTrigger {
+            genericVariables {
+                [
+                    [key: 'ref', value: '$.ref']
+                ]
+            }
+            causeString: 'Triggered on $ref'
+            token: '$GITHUB_TOKEN'
+            printContributedVariables: true
+            printPostContent: true
+            silentResponse: false
+            regexpFilterText: '$ref'
+            regexpFilterExpression: '^refs/heads/develop$'
+        }
     }
 
     stages {
@@ -23,7 +45,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway}:${BUILD_NUMBER}")
+                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}")
                     docker.withRegistry('', 'docker-repo-credential') {
                         dockerImage.push()
                     }
@@ -35,10 +57,10 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        file(credentialsId: 'APPLICATION_YML', variable: 'APPLICATION_YML'),
+                        file(credentialsId: 'GATEWAY_APPLICATION_YML', variable: 'APPLICATION_YML'),
                         file(credentialsId: 'GATEWAY_YML', variable: 'GATEWAY_YML'),
-                        file(credentialsId: 'SWAGGER_YML', variable: 'SWAGGER_YML'),
-                        file(credentialsId: 'AUTH_YML', variable: 'AUTH_YML')
+                        file(credentialsId: 'GATEWAY_SWAGGER_YML', variable: 'SWAGGER_YML'),
+                        file(credentialsId: 'GATEWAY_AUTH_YML', variable: 'AUTH_YML')
                     ]) {
                         sh """
                             kubectl create configmap gateway-config \
