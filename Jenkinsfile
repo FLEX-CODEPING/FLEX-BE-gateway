@@ -5,6 +5,24 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('docker-repo-credential')
         K8S_NAMESPACE = 'default'
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
+        GITHUB_TOKEN = credentials('github_access_token')
+    }
+
+    triggers {
+        genericTrigger {
+            genericVariables {
+                [
+                    [key: 'ref', value: '$.ref']
+                ]
+            }
+            causeString: 'Triggered on $ref'
+            token: '$GITHUB_TOKEN'
+            printContributedVariables: true
+            printPostContent: true
+            silentResponse: false
+            regexpFilterText: '$ref'
+            regexpFilterExpression: '^refs/heads/develop$'
+        }
     }
 
     stages {
@@ -23,7 +41,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway}:${BUILD_NUMBER}")
+                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}")
                     docker.withRegistry('', 'docker-repo-credential') {
                         dockerImage.push()
                     }
