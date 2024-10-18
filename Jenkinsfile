@@ -8,6 +8,10 @@ pipeline {
         GITHUB_TOKEN = credentials('github_access_token')
     }
 
+    tools {
+            maven 'Maven 3.8.1'
+        }
+
     triggers {
         genericTrigger {
             genericVariables {
