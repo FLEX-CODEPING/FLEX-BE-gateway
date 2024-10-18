@@ -66,24 +66,22 @@ pipeline {
 
         stage('Create or Update ConfigMap') {
             steps {
-                script {
-                    withCredentials([
-                        file(credentialsId: 'GATEWAY_APPLICATION_YML', variable: 'APPLICATION_YML'),
-                        file(credentialsId: 'GATEWAY_YML', variable: 'GATEWAY_YML'),
-                        file(credentialsId: 'GATEWAY_SWAGGER_YML', variable: 'SWAGGER_YML'),
-                        file(credentialsId: 'GATEWAY_AUTH_YML', variable: 'AUTH_YML')
-                    ]) {
-                        sh """
-                            kubectl create configmap gateway-config \
-                            --from-literal=APPLICATION_PROFILE=dev \
-                            --from-literal=EUREKA_SERVER_URL=http://eureka-service:8761/eureka/ \
-                            --from-file=application.yml=${APPLICATION_YML} \
-                            --from-file=gateway.yml=${GATEWAY_YML} \
-                            --from-file=swagger.yml=${SWAGGER_YML} \
-                            --from-file=auth.yml=${AUTH_YML} \
-                            -n ${K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
-                        """
-                    }
+                withCredentials([
+                    file(credentialsId: 'GATEWAY_APPLICATION_YML', variable: 'APPLICATION_YML'),
+                    file(credentialsId: 'GATEWAY_YML', variable: 'GATEWAY_YML'),
+                    file(credentialsId: 'GATEWAY_SWAGGER_YML', variable: 'SWAGGER_YML'),
+                    file(credentialsId: 'GATEWAY_AUTH_YML', variable: 'AUTH_YML')
+                ]) {
+                    sh '''
+                        kubectl create configmap gateway-config \
+                        --from-literal=APPLICATION_PROFILE=dev \
+                        --from-literal=EUREKA_SERVER_URL=http://eureka-service:8761/eureka/ \
+                        --from-file=application.yml="${APPLICATION_YML}" \
+                        --from-file=gateway.yml="${GATEWAY_YML}" \
+                        --from-file=swagger.yml="${SWAGGER_YML}" \
+                        --from-file=auth.yml="${AUTH_YML}" \
+                        -n ${K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                    '''
                 }
             }
         }
