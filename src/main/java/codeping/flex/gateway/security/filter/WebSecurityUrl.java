@@ -1,6 +1,7 @@
 package codeping.flex.gateway.security.filter;
 
 public class WebSecurityUrl {
+
     private WebSecurityUrl() {
         throw new IllegalStateException("Utility class");
     }
@@ -20,6 +21,7 @@ public class WebSecurityUrl {
             "/api/investment-service/v3/api-docs",
             "/api/image-service/v3/api-docs"
     };
+
     protected static final String PASSPORT_ENDPOINT = "/api/auth/passport";
     protected static final String[] REISSUANCE_ENDPOINTS = {"/api/v1/auth/reissuance"};
 }

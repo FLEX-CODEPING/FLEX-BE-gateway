@@ -1,5 +1,9 @@
 package codeping.flex.gateway.security.filter;
 
+import static codeping.flex.gateway.security.filter.WebSecurityUrl.PASSPORT_ENDPOINT;
+import static codeping.flex.gateway.security.jwt.AuthConstants.PASSPORT_HEADER_PREFIX;
+import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
+
 import codeping.flex.gateway.global.common.exception.ApplicationException;
 import codeping.flex.gateway.global.common.response.ApplicationResponse;
 import codeping.flex.gateway.global.common.response.code.BaseErrorCode;
@@ -10,6 +14,10 @@ import codeping.flex.gateway.security.jwt.access.AccessTokenValidator;
 import codeping.flex.gateway.security.passport.PassportRequestDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -27,20 +35,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static codeping.flex.gateway.security.filter.WebSecurityUrl.PASSPORT_ENDPOINT;
-import static codeping.flex.gateway.security.jwt.AuthConstants.PASSPORT_HEADER_PREFIX;
-import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AccessTokenFilter implements GlobalFilter {
+
     private static final int TOKEN_EXPIRATION_MINUTES = 30;
 
     private final ServerDomainProperties serverDomainProperties;
@@ -65,11 +65,11 @@ public class AccessTokenFilter implements GlobalFilter {
         }
 
         return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
-                .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
-                .flatMap(accessTokenValidator::validateToken)
-                .flatMap(accessToken -> processPassportData(exchange, accessToken, path))
-                .flatMap(chain::filter)
-                .onErrorResume(error -> handleError(exchange, error));
+            .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
+            .flatMap(accessTokenValidator::validateToken)
+            .flatMap(accessToken -> processPassportData(exchange, accessToken, path))
+            .flatMap(chain::filter)
+            .onErrorResume(error -> handleError(exchange, error));
     }
 
     /**
@@ -79,12 +79,12 @@ public class AccessTokenFilter implements GlobalFilter {
      * @return 인증이 필요한 경로인지 여부
      */
     private boolean isAnonymousEndpoint(String path) {
-        return Stream.of(WebSecurityUrl.READ_ONLY_PUBLIC_ENDPOINTS,
-                        WebSecurityUrl.ANONYMOUS_ENDPOINTS,
-                        WebSecurityUrl.SWAGGER_ENDPOINTS)
-                .flatMap(Arrays::stream)
-                .peek(endpoint -> log.debug("Checking endpoint: {}, Match result: {}", endpoint, pathMatcher.match(endpoint, path)))
-                .anyMatch(endpoint -> pathMatcher.match(endpoint, path));
+        return Stream.of(
+            WebSecurityUrl.READ_ONLY_PUBLIC_ENDPOINTS, WebSecurityUrl.ANONYMOUS_ENDPOINTS, WebSecurityUrl.SWAGGER_ENDPOINTS
+            )
+            .flatMap(Arrays::stream)
+            .peek(endpoint -> log.debug("Checking endpoint: {}, Match result: {}", endpoint, pathMatcher.match(endpoint, path)))
+            .anyMatch(endpoint -> pathMatcher.match(endpoint, path));
     }
 
 
@@ -100,12 +100,11 @@ public class AccessTokenFilter implements GlobalFilter {
      */
     private Mono<Map<String, String>> getPassportData(String accessToken, PassportRequestDto requestDto) {
         return webClient.post()
-                .uri(serverDomainProperties.getService() + PASSPORT_ENDPOINT)
-                .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken)
-                .bodyValue(requestDto)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {
-                });
+            .uri(serverDomainProperties.getService() + PASSPORT_ENDPOINT)
+            .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken)
+            .bodyValue(requestDto)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {});
     }
 
     /**
@@ -114,8 +113,7 @@ public class AccessTokenFilter implements GlobalFilter {
      */
     private Mono<ServerWebExchange> addPassportHeaders(ServerWebExchange exchange, Map<String, String> passport) {
         ServerHttpRequest.Builder builder = exchange.getRequest().mutate();
-        passport.forEach((key, value) ->
-                builder.header(PASSPORT_HEADER_PREFIX.getValue() + key, value));
+        passport.forEach((key, value) -> builder.header(PASSPORT_HEADER_PREFIX.getValue() + key, value));
         ServerHttpRequest newRequest = builder.build();
         return Mono.just(exchange.mutate().request(newRequest).build());
     }
@@ -144,8 +142,7 @@ public class AccessTokenFilter implements GlobalFilter {
 
         byte[] errorResponse = createErrorResponse(errorCode);
 
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                .bufferFactory().wrap(errorResponse)));
+        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(errorResponse)));
     }
 
     private byte[] createErrorResponse(BaseErrorCode errorCode) {

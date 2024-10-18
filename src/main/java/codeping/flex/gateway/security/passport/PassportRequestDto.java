@@ -1,7 +1,6 @@
 package codeping.flex.gateway.security.passport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

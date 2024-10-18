@@ -3,10 +3,11 @@ package codeping.flex.gateway.security.jwt.access;
 import codeping.flex.gateway.global.common.exception.ApplicationException;
 import codeping.flex.gateway.global.common.response.code.GatewayErrorCode;
 import codeping.flex.gateway.security.jwt.AuthConstants;
-import codeping.flex.gateway.security.jwt.JwtClaims;
 import codeping.flex.gateway.security.jwt.TokenValidator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import java.util.Date;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -14,11 +15,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-
-import java.util.Date;
-import java.util.List;
-
-import static codeping.flex.gateway.security.jwt.access.AccessTokenClaimKeys.USER_ID;
 
 @Slf4j
 @Component
@@ -51,26 +47,27 @@ public class AccessTokenValidator implements TokenValidator {
      */
     public Mono<String> validateToken(String token) {
         return Mono.fromCallable(() -> {
-                    if(!StringUtils.hasText(token)){
-                        throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
-                    }
-                    Claims claims = getClaimsFromToken(token);
-                    if (isTokenExpired(claims)) {
-                        throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
-                    }
-                    return token;
-                }).doOnSuccess(t -> log.debug("토큰 검증 성공"))
-                .doOnError(e -> log.error("토큰 검증 실패", e));
+            if(!StringUtils.hasText(token)){
+                throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
+            }
+            Claims claims = getClaimsFromToken(token);
+            if (isTokenExpired(claims)) {
+                throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
+            }
+            return token;
+        })
+            .doOnSuccess(t -> log.debug("토큰 검증 성공"))
+            .doOnError(e -> log.error("토큰 검증 실패", e));
     }
 
     @Override
     public Claims getClaimsFromToken(String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
         } catch (Exception e) {
             log.warn("Token is invalid: {}", e.getMessage());
             throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
@@ -86,5 +83,4 @@ public class AccessTokenValidator implements TokenValidator {
             throw e;
         }
     }
-
 }

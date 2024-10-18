@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum AccessTokenClaimKeys {
+
     USER_ID("id");
 
     private final String value;
