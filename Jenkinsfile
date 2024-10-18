@@ -9,24 +9,22 @@ pipeline {
     }
 
     tools {
-            maven 'Maven 3.8.1'
-        }
+        maven 'Maven'  // Jenkins에 구성된 Maven 설치 이름으로 변경
+    }
 
     triggers {
-        genericTrigger {
-            genericVariables {
-                [
-                    [key: 'ref', value: '$.ref']
-                ]
-            }
-            causeString: 'Triggered on $ref'
-            token: '$GITHUB_TOKEN'
-            printContributedVariables: true
-            printPostContent: true
-            silentResponse: false
-            regexpFilterText: '$ref'
+        genericTrigger(
+            genericVariables: [
+                [key: 'ref', value: '$.ref']
+            ],
+            causeString: 'Triggered on $ref',
+            token: env.GITHUB_TOKEN,
+            printContributedVariables: true,
+            printPostContent: true,
+            silentResponse: false,
+            regexpFilterText: '$ref',
             regexpFilterExpression: '^refs/heads/develop$'
-        }
+        )
     }
 
     stages {
