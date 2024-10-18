@@ -8,10 +8,6 @@ pipeline {
         GITHUB_TOKEN = credentials('github_access_token')
     }
 
-    tools {
-        maven 'Maven'  // Jenkins에 구성된 Maven 설치 이름으로 변경
-    }
-
     triggers {
         GenericTrigger(
             genericVariables: [
@@ -32,11 +28,28 @@ pipeline {
             steps {
                 checkout scm
             }
+            post {
+                success {
+                    echo "Successfully Cloned Repository"
+                }
+                failure {
+                    echo "Failed to Clone Repository"
+                }
+            }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'chmod +x gradlew'
+                sh './gradlew clean build'
+            }
+            post {
+                success {
+                    echo 'Gradle build success'
+                }
+                failure {
+                    echo 'Gradle build failed'
+                }
             }
         }
 
