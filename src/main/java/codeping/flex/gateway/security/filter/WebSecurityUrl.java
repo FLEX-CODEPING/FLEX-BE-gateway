@@ -22,6 +22,6 @@ public class WebSecurityUrl {
             "/api/image-service/v3/api-docs"
     };
 
-    protected static final String PASSPORT_ENDPOINT = "/api/auth/passport";
-    protected static final String[] REISSUANCE_ENDPOINTS = {"/api/v1/auth/reissuance"};
+    protected static final String PASSPORT_ENDPOINT = "/api/passport";
+    protected static final String[] REISSUE_ENDPOINTS = {"/api/auth/reissue"};
 }
