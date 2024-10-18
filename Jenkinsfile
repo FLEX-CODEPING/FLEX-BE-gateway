@@ -6,6 +6,8 @@ pipeline {
         K8S_NAMESPACE = 'default'
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
         GITHUB_TOKEN = credentials('github_access_token')
+        SSH_HOST = '210.109.52.73'
+        SSH_PORT = '10000'
     }
 
     triggers {
@@ -39,18 +41,18 @@ pipeline {
         }
 
         stage('Build') {
-                    steps {
-                        sh 'chmod +x gradlew'
-                        sh './gradlew clean assemble -x test'
-                    }
-                    post {
-                        success {
-                            echo 'Gradle build success'
-                        }
-                        failure {
-                            echo 'Gradle build failed'
-                        }
-                    }
+            steps {
+                sh 'chmod +x gradlew'
+                sh './gradlew clean assemble -x test'
+            }
+            post {
+                success {
+                    echo 'Gradle build success'
+                }
+                failure {
+                    echo 'Gradle build failed'
+                }
+            }
         }
 
         stage('Docker Build & Push') {
@@ -80,7 +82,7 @@ pipeline {
                         --from-file=gateway.yml="${GATEWAY_YML}" \
                         --from-file=swagger.yml="${SWAGGER_YML}" \
                         --from-file=auth.yml="${AUTH_YML}" \
-                        -n ${K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                        -n default --dry-run=client -o yaml | kubectl apply -f -
                     '''
                 }
             }
@@ -94,9 +96,19 @@ pipeline {
                     deploymentYaml = deploymentYaml.replaceAll('\\$\\{IMAGE_TAG\\}', BUILD_NUMBER)
 
                     writeFile file: 'temp-deployment.yaml', text: deploymentYaml
-                    sh "kubectl apply -f temp-deployment.yaml -n ${K8S_NAMESPACE}"
+
+                    sshagent(credentials: ['flex-nat-pem']) {
+                        sh """
+                            scp -P ${SSH_PORT} -o StrictHostKeyChecking=no temp-deployment.yaml ubuntu@${SSH_HOST}:/tmp/temp-deployment.yaml
+                            ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ubuntu@${SSH_HOST} '
+                                kubectl apply -f /tmp/temp-deployment.yaml -n ${K8S_NAMESPACE} &&
+                                rm /tmp/temp-deployment.yaml
+                            '
+                        """
+                    }
                 }
             }
         }
     }
+}
 }
