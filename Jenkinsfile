@@ -53,10 +53,10 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        file(credentialsId: 'APPLICATION_YML', variable: 'APPLICATION_YML'),
+                        file(credentialsId: 'GATEWAY_APPLICATION_YML', variable: 'APPLICATION_YML'),
                         file(credentialsId: 'GATEWAY_YML', variable: 'GATEWAY_YML'),
-                        file(credentialsId: 'SWAGGER_YML', variable: 'SWAGGER_YML'),
-                        file(credentialsId: 'AUTH_YML', variable: 'AUTH_YML')
+                        file(credentialsId: 'GATEWAY_SWAGGER_YML', variable: 'SWAGGER_YML'),
+                        file(credentialsId: 'GATEWAY_AUTH_YML', variable: 'AUTH_YML')
                     ]) {
                         sh """
                             kubectl create configmap gateway-config \
