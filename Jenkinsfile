@@ -13,7 +13,7 @@ pipeline {
     }
 
     triggers {
-        genericTrigger(
+        GenericTrigger(
             genericVariables: [
                 [key: 'ref', value: '$.ref']
             ],
