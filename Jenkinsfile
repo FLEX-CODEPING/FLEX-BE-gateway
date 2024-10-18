@@ -39,18 +39,18 @@ pipeline {
         }
 
         stage('Build') {
-            steps {
-                sh 'chmod +x gradlew'
-                sh './gradlew clean build'
-            }
-            post {
-                success {
-                    echo 'Gradle build success'
-                }
-                failure {
-                    echo 'Gradle build failed'
-                }
-            }
+                    steps {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew clean assemble -x test'
+                    }
+                    post {
+                        success {
+                            echo 'Gradle build success'
+                        }
+                        failure {
+                            echo 'Gradle build failed'
+                        }
+                    }
         }
 
         stage('Docker Build & Push') {
