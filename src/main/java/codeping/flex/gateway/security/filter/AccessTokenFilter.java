@@ -11,10 +11,8 @@ import codeping.flex.gateway.global.common.response.code.CommonErrorCode;
 import codeping.flex.gateway.global.common.response.code.GatewayErrorCode;
 import codeping.flex.gateway.global.properties.ServerDomainProperties;
 import codeping.flex.gateway.security.jwt.access.AccessTokenValidator;
-import codeping.flex.gateway.security.passport.PassportRequestDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -41,8 +39,6 @@ import reactor.core.publisher.Mono;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AccessTokenFilter implements GlobalFilter {
 
-    private static final int TOKEN_EXPIRATION_MINUTES = 30;
-
     private final ServerDomainProperties serverDomainProperties;
     private final AccessTokenValidator accessTokenValidator;
     private final ObjectMapper objectMapper;
@@ -51,7 +47,7 @@ public class AccessTokenFilter implements GlobalFilter {
 
     /**
      * 모든 HTTP 요청에 대해 실행되는 필터 메서드입니다.
-     * 인증이 필요한 엔드포인트에 대해 토큰을 검증하고 Passport 데이터를 헤더에 추가합니다.
+     * 인증이 필요한 엔드포인트를 검증하고 Passport 데이터를 헤더에 추가합니다.
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -67,7 +63,7 @@ public class AccessTokenFilter implements GlobalFilter {
         return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
             .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
             .flatMap(accessTokenValidator::validateToken)
-            .flatMap(accessToken -> processPassportData(exchange, accessToken, path))
+            .flatMap(accessToken -> processPassportData(exchange, accessToken))
             .flatMap(chain::filter)
             .onErrorResume(error -> handleError(exchange, error));
     }
@@ -88,27 +84,26 @@ public class AccessTokenFilter implements GlobalFilter {
     }
 
 
-    private Mono<ServerWebExchange> processPassportData(ServerWebExchange exchange, String accessToken, String path) {
-        return getPassportData(accessToken, PassportRequestDto.of(path, LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)))
-                .flatMap(passportData -> addPassportHeaders(exchange, passportData));
+    private Mono<ServerWebExchange> processPassportData(ServerWebExchange exchange, String accessToken) {
+        return getPassportData(accessToken)
+            .flatMap(passportData -> addPassportHeaders(exchange, passportData));
     }
 
     /**
-     * 검증한 토큰에 대한 사용자의 Passport를 발급하여 반환합니다.
+     * 검증한 토큰에 대한 사용자의 Passport를 발급 받아 반환합니다.
      * @param accessToken Bearer 토큰
      * @return 패스포트 데이터를 포함한 Mono<Map>
      */
-    private Mono<Map<String, String>> getPassportData(String accessToken, PassportRequestDto requestDto) {
-        return webClient.post()
+    private Mono<Map<String, String>> getPassportData(String accessToken) {
+        return webClient.get()
             .uri(serverDomainProperties.getService() + PASSPORT_ENDPOINT)
             .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken)
-            .bodyValue(requestDto)
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<>() {});
     }
 
     /**
-     * 발급한 Paaport를 요청 헤더에 추가합니다.
+     * 발급받은 Passport를 요청 헤더에 추가합니다.
      * @param passport
      */
     private Mono<ServerWebExchange> addPassportHeaders(ServerWebExchange exchange, Map<String, String> passport) {
