@@ -56,7 +56,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['flex-nat-pem']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no -p ${SSH_PORT} ${REMOTE_USER}@${REMOTE_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} -p ${SSH_PORT} '
                             docker pull ${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}
                             docker stop flex-be-gateway || true
                             docker rm flex-be-gateway || true
