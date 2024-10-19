@@ -6,7 +6,7 @@ spring:
       - gateway.yml
       - swagger.yml
       - auth.yml
-
+      - eureka.yml
 server:
   port: ${APPLICATION_PORT:8080}
   tomcat:

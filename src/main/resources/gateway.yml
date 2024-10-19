@@ -11,32 +11,45 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:8080"
+              - "http://localhost:8081"
+              - "http://dev.do-flex.co.kr:8080"
+              - "http://dev.do-flex.co.kr:8081"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
             allowedHeaders: "*"
+            allowCredentials: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       routes:
-        - id: user-service
-          uri: http://localhost:8081
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/passport, /api/user-service/**
-        - id: blog-service
-          uri: http://localhost:8082
+            - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
+        - id: BLOG-SERVICE
+          uri: lb://BLOG-SERVICE
           predicates:
             - Path=/api/blogs/**, /api/posts/**, /api/follow/**, /api/blog-service/**
-        - id: investment-service
-          uri: http://localhost:8083
+        - id: INVESTMENT-SERVICE
+          uri: lb://INVESTMENT-SERVICE
           predicates:
             - Path=/api/investments/**, /api/investment-service/**
-        - id: stock-service
-          uri: http://localhost:8084
+        - id: STOCK-SERVICE
+          uri: lb://STOCK-SERVICE
           predicates:
             - Path=/api/stocks/**, /api/stock-service/**
-        - id: image-service
-          uri: http://loacalhost:8085
+        - id: IMAGE-SERVICE
+          uri: lb://IMAGE-SERVICE
           predicates:
             - Path=/api/presigned-url/**, /api/image-service/**
-        - id: ai-news-service
-          uri: http://loacalhost:8086
+        - id: AI-NEWS-SERVICE
+          uri: lb://AI-NEWS-SERVICE
           predicates:
             - Path=/api/news-summary/**, /api/ai-news-service/**
 management:
