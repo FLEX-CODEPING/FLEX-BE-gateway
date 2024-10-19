@@ -1,11 +1,11 @@
 package codeping.flex.gateway.global.config;
 
-import codeping.flex.gateway.global.properties.ServerDomainProperties;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.time.Duration;
-import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -16,13 +16,13 @@ import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+import java.time.Duration;
+import java.util.function.Function;
+
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 public class WebClientConfig {
-    private final ServerDomainProperties serverDomainProperties;
-
-    public WebClientConfig(ServerDomainProperties serverDomainProperties) {
-        this.serverDomainProperties = serverDomainProperties;
-    }
 
     @Bean
     public ReactorResourceFactory resourceFactory() {
@@ -30,7 +30,8 @@ public class WebClientConfig {
     }
 
     @Bean
-    public WebClient webClient() {
+    @LoadBalanced
+    public WebClient.Builder loadBalancedWebClientBuilder() {
         Function<HttpClient, HttpClient> mapper = client -> HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10))
@@ -40,14 +41,19 @@ public class WebClientConfig {
         ClientHttpConnector connector = new ReactorClientHttpConnector(resourceFactory(), mapper);
 
         return WebClient.builder()
-                .baseUrl(serverDomainProperties.getUser())
                 .clientConnector(connector)
                 .filter((request, next) -> {
                     ClientRequest filtered = ClientRequest.from(request)
                             .header(HttpHeaders.AUTHORIZATION, request.headers().getFirst(HttpHeaders.AUTHORIZATION))
                             .build();
                     return next.exchange(filtered);
-                })
+                });
+    }
+
+    @Bean
+    public WebClient userServiceClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder
+                .baseUrl("http://USER-SERVICE")
                 .build();
     }
 }
