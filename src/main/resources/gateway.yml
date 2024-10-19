@@ -8,6 +8,17 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+#            allow-credentials: true
+#            allowedHeaders:
+#              - x-requested-with
+#              - Authorization
+#              - content-type
       routes:
         - id: user-service
           uri: http://localhost:8081
@@ -47,6 +58,7 @@ spring.config.activate.on-profile: dev
 spring:
   cloud:
     gateway:
+
       discovery:
         locator:
           enabled: true

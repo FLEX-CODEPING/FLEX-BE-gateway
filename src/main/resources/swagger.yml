@@ -23,6 +23,7 @@ springdoc:
         url: /api/ai-news-service/v3/api-docs
   api-docs:
     path: /api/v3/api-docs
+  enable-spring-security: true
 
 ---
 spring.config.activate.on-profile: local
