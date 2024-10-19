@@ -32,7 +32,7 @@ swagger.server.url: http://localhost:8080
 ---
 spring.config.activate.on-profile: dev
 
-swagger.server.url: http://dev.do-flex.co.kr
+swagger.server.url: ${SWAGGER_SERVER_URL}:8080
 
 ---
 spring.config.activate.on-profile: prod

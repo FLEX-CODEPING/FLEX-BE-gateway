@@ -1,11 +1,6 @@
 package codeping.flex.gateway.security.jwt;
 
 import io.jsonwebtoken.Claims;
-import org.springframework.util.StringUtils;
-
-import java.time.LocalDateTime;
-
-import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
 
 public interface TokenValidator {
 
