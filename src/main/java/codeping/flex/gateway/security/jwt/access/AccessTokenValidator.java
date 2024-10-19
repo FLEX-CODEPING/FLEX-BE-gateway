@@ -5,9 +5,13 @@ import codeping.flex.gateway.global.common.response.code.GatewayErrorCode;
 import codeping.flex.gateway.security.jwt.AuthConstants;
 import codeping.flex.gateway.security.jwt.TokenValidator;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.List;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +36,10 @@ public class AccessTokenValidator implements TokenValidator {
         List<String> authHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
         if (authHeaders != null && !authHeaders.isEmpty()) {
             String authHeader = authHeaders.get(0);
-            if (StringUtils.hasText(authHeader) && authHeader.startsWith(AuthConstants.TOKEN_PREFIX.getValue())) {
-                return authHeader.substring(AuthConstants.TOKEN_PREFIX.getValue().length());
+            log.info("auth header: {}", authHeader);
+            if (StringUtils.hasText(authHeader) && authHeader.startsWith(AuthConstants.BEARER.getValue())) {
+                log.info("extracted token: {}", authHeader.split(" ")[1]);
+                return authHeader.split(" ")[1];
             }
         }
         return null;
@@ -62,12 +68,16 @@ public class AccessTokenValidator implements TokenValidator {
 
     @Override
     public Claims getClaimsFromToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         try {
-            return Jwts.parser()
-                .setSigningKey(secretKey)
+            return Jwts.parserBuilder()
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+        } catch (ExpiredJwtException e) {
+            log.warn("Token is expired: {}", e.getMessage());
+            throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
         } catch (Exception e) {
             log.warn("Token is invalid: {}", e.getMessage());
             throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);

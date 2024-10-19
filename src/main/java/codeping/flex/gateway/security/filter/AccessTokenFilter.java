@@ -1,8 +1,8 @@
 package codeping.flex.gateway.security.filter;
 
 import static codeping.flex.gateway.security.filter.WebSecurityUrl.PASSPORT_ENDPOINT;
+import static codeping.flex.gateway.security.jwt.AuthConstants.BEARER;
 import static codeping.flex.gateway.security.jwt.AuthConstants.PASSPORT_HEADER_PREFIX;
-import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
 
 import codeping.flex.gateway.global.common.exception.ApplicationException;
 import codeping.flex.gateway.global.common.response.ApplicationResponse;
@@ -59,7 +59,6 @@ public class AccessTokenFilter implements GlobalFilter {
             log.debug("Anonymous endpoint detected, skipping authentication");
             return chain.filter(exchange);
         }
-
         return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
             .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
             .flatMap(accessTokenValidator::validateToken)
@@ -83,7 +82,6 @@ public class AccessTokenFilter implements GlobalFilter {
             .anyMatch(endpoint -> pathMatcher.match(endpoint, path));
     }
 
-
     private Mono<ServerWebExchange> processPassportData(ServerWebExchange exchange, String accessToken) {
         return getPassportData(accessToken)
             .flatMap(passportData -> addPassportHeaders(exchange, passportData));
@@ -96,8 +94,8 @@ public class AccessTokenFilter implements GlobalFilter {
      */
     private Mono<Map<String, String>> getPassportData(String accessToken) {
         return webClient.get()
-            .uri(serverDomainProperties.getService() + PASSPORT_ENDPOINT)
-            .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken)
+            .uri(PASSPORT_ENDPOINT)
+            .header(HttpHeaders.AUTHORIZATION, BEARER.getValue() + " " + accessToken)
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<>() {});
     }

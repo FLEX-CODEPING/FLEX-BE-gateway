@@ -1,8 +1,3 @@
----
-spring.config.activate.on-profile: local
-
-swagger.server.url: http://localhost:8080
-
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
@@ -26,11 +21,29 @@ springdoc:
         url: /api/image-service/v3/api-docs
       - name: AI 뉴스 요약 서비스
         url: /api/ai-news-service/v3/api-docs
+    persistAuthorization: true
   api-docs:
     path: /api/v3/api-docs
 
+  # 전역 보안 스키마 설정
+  components:
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  security:
+    - bearerAuth: []
+
+---
+spring.config.activate.on-profile: local
+
+swagger.server.url: http://localhost:8080
+
 ---
 spring.config.activate.on-profile: dev
+
+swagger.server.url: ${SWAGGER_SERVER_URL}:8080
 
 ---
 spring.config.activate.on-profile: prod
