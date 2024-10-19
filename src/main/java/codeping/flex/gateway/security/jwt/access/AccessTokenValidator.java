@@ -9,6 +9,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import java.util.List;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +19,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -54,16 +53,17 @@ public class AccessTokenValidator implements TokenValidator {
      */
     public Mono<String> validateToken(String token) {
         return Mono.fromCallable(() -> {
-                    if(!StringUtils.hasText(token)){
-                        throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
-                    }
-                    Claims claims = getClaimsFromToken(token);
-                    if (isTokenExpired(claims)) {
-                        throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
-                    }
-                    return token;
-                }).doOnSuccess(t -> log.debug("토큰 검증 성공"))
-                .doOnError(e -> log.error("토큰 검증 실패", e));
+            if(!StringUtils.hasText(token)){
+                throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
+            }
+            Claims claims = getClaimsFromToken(token);
+            if (isTokenExpired(claims)) {
+                throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
+            }
+            return token;
+        })
+            .doOnSuccess(t -> log.debug("토큰 검증 성공"))
+            .doOnError(e -> log.error("토큰 검증 실패", e));
     }
 
     @Override
@@ -71,10 +71,10 @@ public class AccessTokenValidator implements TokenValidator {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
         } catch (ExpiredJwtException e) {
             log.warn("Token is expired: {}", e.getMessage());
             throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
@@ -93,5 +93,4 @@ public class AccessTokenValidator implements TokenValidator {
             throw e;
         }
     }
-
 }

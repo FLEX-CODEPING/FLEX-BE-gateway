@@ -1,10 +1,9 @@
 package codeping.flex.gateway.security.jwt.access;
 
 import codeping.flex.gateway.security.jwt.JwtClaims;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AccessTokenClaim implements JwtClaims {

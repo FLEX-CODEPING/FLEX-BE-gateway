@@ -34,7 +34,7 @@ public class AccessTokenFilterIntegrationTest {
     void testAnonymousEndpoints(String uri) {
         webTestClient.post().uri(uri)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isBadRequest();
     }
 
     /**
