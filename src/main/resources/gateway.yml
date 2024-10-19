@@ -32,7 +32,7 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
-        - id: BLOG-SERVICE
+        - id: blog-service
           uri: lb://BLOG-SERVICE
           predicates:
             - Path=/api/blogs/**, /api/posts/**, /api/follow/**, /api/blog-service/**
