@@ -1,5 +1,6 @@
 package codeping.flex.gateway.security.filter;
 
+import static codeping.flex.gateway.security.filter.WebSecurityUrl.EXCLUDE_TOKEN_VALIDATION;
 import static codeping.flex.gateway.security.filter.WebSecurityUrl.PASSPORT_ENDPOINT;
 import static codeping.flex.gateway.security.jwt.AuthConstants.BEARER;
 import static codeping.flex.gateway.security.jwt.AuthConstants.PASSPORT_HEADER_PREFIX;
@@ -52,22 +53,51 @@ public class AccessTokenFilter implements GlobalFilter {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
 
-        // 인증이 필요하지 않은 path 는 filter를 거치지 않음
+        // 인증이 필요하지 않은 경로
         if (isAnonymousEndpoint(path)) {
             log.debug("Anonymous endpoint detected, skipping authentication");
             return chain.filter(exchange);
         }
-        return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
-            .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
-            .flatMap(accessTokenValidator::validateToken)
-            .flatMap(accessToken -> processPassportData(exchange, accessToken))
-            .flatMap(chain::filter)
+
+        // 토큰 추출 공통 로직
+        Mono<String> extractedTokenMono = Mono.justOrEmpty(accessTokenValidator.extractToken(request))
+            .switchIfEmpty(Mono.error(ApplicationException.from(GatewayErrorCode.EMPTY_TOKEN)));
+
+        // 엔드포인트에 대한 토큰 검증 필요 유무 판단
+        boolean requiresTokenValidation = !isExcludedFromTokenValidation(path);
+
+        return extractedTokenMono
+            .flatMap(token -> grantPassportByToken(exchange, chain, token, requiresTokenValidation))
             .onErrorResume(error -> handleError(exchange, error));
     }
 
     /**
+     * 주어진 경로가 토큰 검증에서 제외된 엔드포인트인지 확인합니다.
+     * @param path 검사할 URI 경로
+     * @return 토큰 검증에서 제외된 경로인지 여부
+     */
+    private boolean isExcludedFromTokenValidation(String path) {
+        return Stream.of(EXCLUDE_TOKEN_VALIDATION)
+            .anyMatch(endpoint -> pathMatcher.match(endpoint, path));
+    }
+
+    /**
+     * 추출된 토큰으로 Passport 데이터를 헤더에 추가합니다.
+     * requiresTokenValidation 값에 따라 토큰 검증 처리를 포함합니다.
+     */
+    private Mono<Void> grantPassportByToken(ServerWebExchange exchange, GatewayFilterChain chain, String token, boolean requiresTokenValidation) {
+        Mono<String> validTokenMono = requiresTokenValidation
+            ? accessTokenValidator.validateToken(token)
+            : Mono.just(token);
+
+        return validTokenMono
+            .flatMap(validToken -> processPassportData(exchange, validToken))
+            .flatMap(chain::filter);
+    }
+
+    /**
      * 주어진 경로가 인증이 필요 없는 엔드포인트인지 확인하여
-     * 인증이 필요 없는 경로이면 true, 그렇지 않으면 false를 반환합니다.
+     * 인증이 필요 없는 경로이면 true, 그렇지 않으면 false 를 반환합니다.
      * @param path 검사할 URI 경로
      * @return 인증이 필요한 경로인지 여부
      */
