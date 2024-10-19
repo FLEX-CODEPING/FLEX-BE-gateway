@@ -6,7 +6,6 @@ spring:
       - gateway.yml
       - swagger.yml
       - auth.yml
-      - env.properties
 
 server:
   port: ${APPLICATION_PORT:8080}

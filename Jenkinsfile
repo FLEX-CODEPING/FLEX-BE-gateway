@@ -44,7 +44,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}")
+                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway:latest")
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-repo-credential') {
                         dockerImage.push()
                     }
@@ -57,10 +57,10 @@ pipeline {
                 sshagent(credentials: ['flex-nat-pem']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} -p ${SSH_PORT} '
-                            docker pull ${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}
+                            docker pull ${DOCKER_USERNAME}/flex-be-gateway:latest
                             docker stop flex-be-gateway || true
                             docker rm flex-be-gateway || true
-                            docker run -d --name flex-be-gateway -p 8080:8080 ${DOCKER_USERNAME}/flex-be-gateway:${BUILD_NUMBER}
+                            docker run -d --name flex-be-gateway -p 8080:8080 ${DOCKER_USERNAME}/flex-be-gateway:latest
                         '
                     """
                 }
