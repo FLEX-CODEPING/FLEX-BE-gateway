@@ -9,7 +9,6 @@ import codeping.flex.gateway.global.common.response.ApplicationResponse;
 import codeping.flex.gateway.global.common.response.code.BaseErrorCode;
 import codeping.flex.gateway.global.common.response.code.CommonErrorCode;
 import codeping.flex.gateway.global.common.response.code.GatewayErrorCode;
-import codeping.flex.gateway.global.properties.ServerDomainProperties;
 import codeping.flex.gateway.security.jwt.access.AccessTokenValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +38,6 @@ import reactor.core.publisher.Mono;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AccessTokenFilter implements GlobalFilter {
 
-    private final ServerDomainProperties serverDomainProperties;
     private final AccessTokenValidator accessTokenValidator;
     private final ObjectMapper objectMapper;
     private final PathMatcher pathMatcher;
