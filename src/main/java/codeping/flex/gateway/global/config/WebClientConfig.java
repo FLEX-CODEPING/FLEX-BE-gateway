@@ -40,7 +40,7 @@ public class WebClientConfig {
         ClientHttpConnector connector = new ReactorClientHttpConnector(resourceFactory(), mapper);
 
         return WebClient.builder()
-                .baseUrl(serverDomainProperties.getService())
+                .baseUrl(serverDomainProperties.getUser())
                 .clientConnector(connector)
                 .filter((request, next) -> {
                     ClientRequest filtered = ClientRequest.from(request)

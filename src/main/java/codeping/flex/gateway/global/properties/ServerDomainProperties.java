@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "server.domain")
 public class ServerDomainProperties {
-
-    private final String local;
+    private final String user;
     private final String service;
 }
