@@ -34,14 +34,13 @@ import java.util.stream.Stream;
 
 import static codeping.flex.gateway.security.filter.WebSecurityUrl.PASSPORT_ENDPOINT;
 import static codeping.flex.gateway.security.jwt.AuthConstants.PASSPORT_HEADER_PREFIX;
-import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
+import static codeping.flex.gateway.security.jwt.AuthConstants.BEARER;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AccessTokenFilter implements GlobalFilter {
-    private static final int TOKEN_EXPIRATION_MINUTES = 30;
 
     private final ServerDomainProperties serverDomainProperties;
     private final AccessTokenValidator accessTokenValidator;
@@ -63,7 +62,6 @@ public class AccessTokenFilter implements GlobalFilter {
             log.debug("Anonymous endpoint detected, skipping authentication");
             return chain.filter(exchange);
         }
-
         return Mono.justOrEmpty(accessTokenValidator.extractToken(request))
                 .switchIfEmpty(Mono.error(new ApplicationException(GatewayErrorCode.EMPTY_TOKEN)))
                 .flatMap(accessTokenValidator::validateToken)
@@ -89,7 +87,8 @@ public class AccessTokenFilter implements GlobalFilter {
 
 
     private Mono<ServerWebExchange> processPassportData(ServerWebExchange exchange, String accessToken, String path) {
-        return getPassportData(accessToken, PassportRequestDto.of(path, LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)))
+        log.info("passport token{}", accessToken);
+        return getPassportData(accessToken)
                 .flatMap(passportData -> addPassportHeaders(exchange, passportData));
     }
 
@@ -98,11 +97,10 @@ public class AccessTokenFilter implements GlobalFilter {
      * @param accessToken Bearer 토큰
      * @return 패스포트 데이터를 포함한 Mono<Map>
      */
-    private Mono<Map<String, String>> getPassportData(String accessToken, PassportRequestDto requestDto) {
-        return webClient.post()
-                .uri(serverDomainProperties.getService() + PASSPORT_ENDPOINT)
-                .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken)
-                .bodyValue(requestDto)
+    private Mono<Map<String, String>> getPassportData(String accessToken) {
+        return webClient.get()
+                .uri(PASSPORT_ENDPOINT)
+                .header(HttpHeaders.AUTHORIZATION, BEARER.getValue() + " "+ accessToken)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });

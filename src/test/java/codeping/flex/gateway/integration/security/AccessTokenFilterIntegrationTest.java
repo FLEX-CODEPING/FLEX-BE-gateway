@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static codeping.flex.gateway.integration.security.WebSecurityUrl.ANONYMOUS_ENDPOINTS;
 import static codeping.flex.gateway.security.jwt.AuthConstants.AUTHORIZATION;
-import static codeping.flex.gateway.security.jwt.AuthConstants.TOKEN_PREFIX;
+import static codeping.flex.gateway.security.jwt.AuthConstants.BEARER;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local")
@@ -60,7 +60,7 @@ public class AccessTokenFilterIntegrationTest {
     @Test
     void testProtectedEndpointWithInvalidToken() {
         webTestClient.get().uri("/api/users/profile")
-                .header(AUTHORIZATION.getValue(), TOKEN_PREFIX.getValue()+"invalid_token")
+                .header(AUTHORIZATION.getValue(), BEARER.getValue()+"invalid_token")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isUnauthorized()
