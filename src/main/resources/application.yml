@@ -6,6 +6,7 @@ spring:
       - gateway.yml
       - swagger.yml
       - auth.yml
+      - env.properties
 
 server:
   port: ${APPLICATION_PORT:8080}
@@ -15,7 +16,7 @@ server:
       max: 600
       min-spare: 100
   domain:
-    service: ${FLEX_SERVICE_DOMAIN:http://127.0.0.1:8081}
+    user: ${FLEX_USER_SERVICE_DOMAIN:http://127.0.0.1:8081}
 
 logging:
   level:
