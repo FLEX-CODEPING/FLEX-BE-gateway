@@ -16,8 +16,7 @@ server:
       min-spare: 100
   domain:
     user: ${FLEX_USER_SERVICE_DOMAIN:http://127.0.0.1:8081}
-    local: ${FLEX_LOCAL_DOMAIN:127.0.0.1:8080} # TODO: to be modified
-    service: ${FLEX_SERVICE_DOMAIN:127.0.0.1:8080} # TODO: to be modified
+    service: ${FLEX_SERVICE_DOMAIN:http://127.0.0.1:8080} # TODO: to be modified
 
 logging:
   level:
