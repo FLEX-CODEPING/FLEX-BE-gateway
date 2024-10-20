@@ -13,6 +13,7 @@ import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorResourceFactory;
 import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunctions;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -33,10 +34,10 @@ public class WebClientConfig {
     @LoadBalanced
     public WebClient.Builder loadBalancedWebClientBuilder() {
         Function<HttpClient, HttpClient> mapper = client -> HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10))
-                        .addHandlerLast(new WriteTimeoutHandler(10)))
-                .responseTimeout(Duration.ofSeconds(10));
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(15))
+                        .addHandlerLast(new WriteTimeoutHandler(15)))
+                .responseTimeout(Duration.ofSeconds(15));
 
         ClientHttpConnector connector = new ReactorClientHttpConnector(resourceFactory(), mapper);
 
@@ -46,7 +47,8 @@ public class WebClientConfig {
                     ClientRequest filtered = ClientRequest.from(request)
                             .header(HttpHeaders.AUTHORIZATION, request.headers().getFirst(HttpHeaders.AUTHORIZATION))
                             .build();
-                    return next.exchange(filtered);
+                    return next.exchange(filtered)
+                            .doOnError(error -> log.error("Error during WebClient request: ", error));
                 });
     }
 
