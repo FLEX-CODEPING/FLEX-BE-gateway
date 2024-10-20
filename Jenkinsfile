@@ -5,10 +5,6 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('docker-repo-credential')
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
         GITHUB_TOKEN = credentials('github_access_token')
-        REMOTE_USER = 'ubuntu'
-        REMOTE_HOST = '210.109.52.73'
-        SSH_PORT = '10000'
-        SSH_CREDENTIALS = credentials('flex-nat-pem')
     }
 
     stages {
