@@ -136,6 +136,11 @@ public class AccessTokenFilter implements GlobalFilter {
         ServerHttpRequest.Builder builder = exchange.getRequest().mutate();
         passport.forEach((key, value) -> builder.header(PASSPORT_HEADER_PREFIX.getValue() + key, value));
         ServerHttpRequest newRequest = builder.build();
+
+        log.info("Processed Passport:");
+        newRequest.getHeaders().forEach((key, values) -> {
+            log.info("  {}: {}", key, String.join(", ", values));
+        });
         return Mono.just(exchange.mutate().request(newRequest).build());
     }
 

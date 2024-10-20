@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum AuthConstants {
 
-    AUTHORIZATION("Authorization"), BEARER("Bearer"), PASSPORT_HEADER_PREFIX ("X-PP-");
+    AUTHORIZATION("Authorization"), BEARER("Bearer"), PASSPORT_HEADER_PREFIX ("x-pp-");
 
     private final String value;
 
