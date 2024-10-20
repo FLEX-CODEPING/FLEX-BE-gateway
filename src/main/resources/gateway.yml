@@ -1,6 +1,3 @@
----
-spring.config.activate.on-profile: local
-
 spring:
   main:
     web-application-type: reactive
@@ -8,76 +5,20 @@ spring:
     name: gateway-service
   cloud:
     gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins:
-              - "http://localhost:3000"
-              - "http://localhost:8080"
-              - "http://localhost:8081"
-              - "http://dev.do-flex.co.kr:8080"
-              - "http://dev.do-flex.co.kr:8081"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-      routes:
-        - id: USER-SERVICE
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
-        - id: blog-service
-          uri: lb://BLOG-SERVICE
-          predicates:
-            - Path=/api/blogs/**, /api/posts/**, /api/follow/**, /api/blog-service/**
-        - id: INVESTMENT-SERVICE
-          uri: lb://INVESTMENT-SERVICE
-          predicates:
-            - Path=/api/investments/**, /api/investment-service/**
-        - id: STOCK-SERVICE
-          uri: lb://STOCK-SERVICE
-          predicates:
-            - Path=/api/stocks/**, /api/stock-service/**
-        - id: IMAGE-SERVICE
-          uri: lb://IMAGE-SERVICE
-          predicates:
-            - Path=/api/presigned-url/**, /api/image-service/**
-        - id: AI-NEWS-SERVICE
-          uri: lb://AI-NEWS-SERVICE
-          predicates:
-            - Path=/api/news-summary/**, /api/ai-news-service/**
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  endpoint:
-    gateway:
-      enabled: true
-
----
-spring.config.activate.on-profile: dev
-spring:
-  cloud:
-    gateway:
       discovery:
         locator:
           enabled: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       routes:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/follow/**, /api/user-service/**
+            - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
         - id: blog-service
           uri: lb://blog-service
           predicates:
-            - Path=/api/blogs/**, /api/posts/**, /api/blog-service/**
+            - Path=/api/blogs/**, /api/posts/**, /api/follow/**, /api/blog-service/**
         - id: investment-service
           uri: lb://investment-service
           predicates:
@@ -94,5 +35,93 @@ spring:
           uri: lb://ai-news-service
           predicates:
             - Path=/api/news-summary/**, /api/ai-news-service/**
+      management:
+        endpoints:
+          web:
+            exposure:
+              include: '*'
+        endpoint:
+          gateway:
+            enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    gateway:
+      enabled: true
+
+---
+spring.config.activate.on-profile: local
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:8080"
+              - "http://localhost:8081"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+
+---
+spring.config.activate.on-profile: dev
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://dev.do-flex.co.kr:8080"
+              - "http://dev.do-flex.co.kr:8081"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+
 ---
 spring.config.activate.on-profile: prod
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://prod.do-flex.co.kr"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
+            allowCredentials: true
+
+logging:
+  level:
+    root: WARN
+    org.springframework.cloud.gateway: INFO
