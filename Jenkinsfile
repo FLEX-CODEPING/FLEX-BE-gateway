@@ -5,6 +5,10 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('docker-repo-credential')
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
         GITHUB_TOKEN = credentials('github_access_token')
+        REMOTE_USER = 'ubuntu'
+        REMOTE_HOST = credentials('gateway-remote-host')
+        SSH_CREDENTIALS = credentials('flex-nat-pem')
+        IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
     }
 
     stages {
@@ -40,7 +44,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    def dockerImage = docker.build("${DOCKER_USERNAME}/flex-be-gateway:latest")
+                    def dockerImage = docker.build("${IMAGE_NAME}:latest")
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-repo-credential') {
                         dockerImage.push()
                     }
@@ -52,11 +56,15 @@ pipeline {
             steps {
                 sshagent(credentials: ['flex-nat-pem']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} -p ${SSH_PORT} '
-                            docker pull ${DOCKER_USERNAME}/flex-be-gateway:latest
-                            docker stop flex-be-gateway || true
-                            docker rm flex-be-gateway || true
-                            docker run -d --name flex-be-gateway -p 8080:8080 ${DOCKER_USERNAME}/flex-be-gateway:latest
+                        ssh ${REMOTE_USER}@${REMOTE_HOST} '
+                            set -e
+
+                            docker compose pull
+
+                            docker compose down
+                            docker compose up -d
+
+                            docker image prune -f
                         '
                     """
                 }
