@@ -9,6 +9,7 @@ pipeline {
         REMOTE_HOST = credentials('gateway-remote-host')
         SSH_CREDENTIALS = credentials('flex-nat-pem')
         IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -44,9 +45,10 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    def dockerImage = docker.build("${IMAGE_NAME}:latest")
+                    def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-repo-credential') {
                         dockerImage.push()
+                        dockerImage.push('latest')
                     }
                 }
             }
@@ -61,6 +63,7 @@ pipeline {
 
                             docker compose pull
 
+                            export IMAGE_TAG=${IMAGE_TAG}
                             docker compose down
                             docker compose up -d
 
