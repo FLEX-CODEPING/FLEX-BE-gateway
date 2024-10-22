@@ -61,13 +61,14 @@ pipeline {
                         ssh ${REMOTE_USER}@${REMOTE_HOST} '
                             set -e
 
+                            export IMAGE_TAG=${IMAGE_TAG:-latest}
+                            docker compose down --remove-orphans
                             docker compose pull
 
-                            export IMAGE_TAG=${IMAGE_TAG}
-                            docker compose down
                             docker compose up -d
 
                             docker image prune -f
+                            docker compose ps
                         '
                     """
                 }
