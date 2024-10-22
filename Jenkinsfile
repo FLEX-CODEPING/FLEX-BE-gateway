@@ -61,7 +61,7 @@ pipeline {
                         ssh ${REMOTE_USER}@${REMOTE_HOST} '
                             set -e
 
-                            export IMAGE_TAG=${IMAGE_TAG:-latest}
+                            export IMAGE_TAG=${IMAGE_TAG}
                             docker compose down --remove-orphans
                             docker compose pull
 
