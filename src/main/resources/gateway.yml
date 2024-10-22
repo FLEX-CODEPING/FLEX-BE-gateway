@@ -32,9 +32,9 @@ spring:
           predicates:
             - Path=/api/presigned-url/**, /api/image-service/**
         - id: ai-news-service
-          uri: lb://ai-news-service
+          uri: ${AI_SERVER_URL:http://localhost:40020}
           predicates:
-            - Path=/api/news-summary/**, /api/ai-news-service/**
+            - Path=/api/news-summary/**, /api/news-service/**
       management:
         endpoints:
           web:
@@ -64,6 +64,7 @@ spring:
               - "http://localhost:3000"
               - "http://localhost:8080"
               - "http://localhost:8081"
+              - "http://localhost:40020"
             allowedMethods:
               - GET
               - POST
@@ -90,6 +91,8 @@ spring:
               - "http://localhost:3000"
               - "http://dev.do-flex.co.kr:8080"
               - "http://dev.do-flex.co.kr:8081"
+              - "http://do-flex.co.kr:3000"
+              - ${AI_SERVER_URL}
             allowedMethods:
               - GET
               - POST
@@ -113,6 +116,7 @@ spring:
           '[/**]':
             allowedOrigins:
               - "https://prod.do-flex.co.kr"
+              - ${AI_SERVER_URL}
             allowedMethods:
               - GET
               - POST

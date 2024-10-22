@@ -17,7 +17,7 @@ public class WebSecurityUrl {
             "/swagger-resources/**",
             "/api/blog-service/v3/api-docs",
             "/api/user-service/v3/api-docs",
-            "/api/ai-news-service/v3/api-docs",
+            "/api/news-service/openapi.json",
             "/api/stock-service/v3/api-docs",
             "/api/investment-service/v3/api-docs",
             "/api/image-service/v3/api-docs"

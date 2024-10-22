@@ -20,7 +20,8 @@ springdoc:
       - name: 이미지 서비스
         url: /api/image-service/v3/api-docs
       - name: AI 뉴스 요약 서비스
-        url: /api/ai-news-service/v3/api-docs
+        url: /api/news-service/openapi.json
+
     persistAuthorization: true
   api-docs:
     path: /api/v3/api-docs
