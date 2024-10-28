@@ -67,6 +67,6 @@ public class AccessTokenFilterIntegrationTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.isSuccess").isEqualTo(false)
-                .jsonPath("$.code").isEqualTo(GatewayErrorCode.INVALID_TOKEN.getCustomCode());
+                .jsonPath("$.code").isEqualTo(GatewayErrorCode.INVALID_JWT.getCustomCode());
     }
 }
