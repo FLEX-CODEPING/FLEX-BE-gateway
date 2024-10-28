@@ -54,11 +54,11 @@ public class AccessTokenValidator implements TokenValidator {
     public Mono<String> validateToken(String token) {
         return Mono.fromCallable(() -> {
             if(!StringUtils.hasText(token)){
-                throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
+                throw new ApplicationException(GatewayErrorCode.INVALID_JWT);
             }
             Claims claims = getClaimsFromToken(token);
             if (isTokenExpired(claims)) {
-                throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
+                throw new ApplicationException(GatewayErrorCode.JWT_EXPIRED);
             }
             return token;
         })
@@ -77,10 +77,10 @@ public class AccessTokenValidator implements TokenValidator {
                 .getBody();
         } catch (ExpiredJwtException e) {
             log.warn("Token is expired: {}", e.getMessage());
-            throw new ApplicationException(GatewayErrorCode.EXPIRED_TOKEN);
+            throw new ApplicationException(GatewayErrorCode.JWT_EXPIRED);
         } catch (Exception e) {
             log.warn("Token is invalid: {}", e.getMessage());
-            throw new ApplicationException(GatewayErrorCode.INVALID_TOKEN);
+            throw new ApplicationException(GatewayErrorCode.INVALID_JWT);
         }
     }
 
