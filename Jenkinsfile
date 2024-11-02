@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS = credentials('docker-repo-credential')
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
-        GITHUB_TOKEN = credentials('github_access_token')
-        REMOTE_USER = 'ubuntu'
+        GITHUB_TOKEN = credentials('github-access-token')
+        REMOTE_USER = 'codeping'
         REMOTE_HOST = credentials('gateway-remote-host')
         SSH_CREDENTIALS = credentials('flex-nat-pem')
         IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
