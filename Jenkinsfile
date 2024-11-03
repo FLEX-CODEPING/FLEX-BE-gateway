@@ -9,6 +9,7 @@ pipeline {
         REMOTE_USER = credentials('remote-user')
         BASTION_HOST = credentials('bastion-host')
         REMOTE_HOST = credentials('dev-gateway-host')
+        SLACK_CHANNEL = '#backend-jenkins'  // 채널 이름 수정
         IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
@@ -29,6 +30,9 @@ pipeline {
         }
 
         stage('Build') {
+             script {
+                   slackSend(channel: SLACK_CHANNEL, message: "🏗️ GATEWAY Build #${env.BUILD_NUMBER} is starting...")
+             }
             steps {
                 sh 'chmod +x gradlew'
                 sh './gradlew clean assemble -x test'
@@ -36,9 +40,11 @@ pipeline {
             post {
                 success {
                     echo 'Gradle build success'
+                    slackSend(channel: SLACK_CHANNEL, message: "✅ Gradle build succeeded for Build #${env.BUILD_NUMBER}.")
                 }
                 failure {
                     echo 'Gradle build failed'
+                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ Gradle build failed for Build #${env.BUILD_NUMBER}.")
                 }
             }
         }
@@ -78,6 +84,14 @@ pipeline {
                             docker compose ps
                         '
                     """
+                }
+            }
+            post {
+                success {
+                    slackSend(channel: SLACK_CHANNEL, message: "🚀 Deployment SUCCEED for Build #${env.BUILD_NUMBER}.")
+                }
+                failure {
+                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ Deployment FAILED for Build #${env.BUILD_NUMBER}.")
                 }
             }
         }
