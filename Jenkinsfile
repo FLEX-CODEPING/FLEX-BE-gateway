@@ -21,16 +21,6 @@ pipeline {
                     checkout scm
                 }
             }
-            post {
-                success {
-                    echo "Successfully Cloned Repository"
-                    slackSend(channel: SLACK_CHANNEL, message: "✅ Successfully cloned repository for Build #${env.BUILD_NUMBER}.")
-                }
-                failure {
-                    echo "Failed to Clone Repository"
-                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ Failed to clone repository for Build #${env.BUILD_NUMBER}.")
-                }
-            }
         }
 
         stage('Build') {
@@ -44,11 +34,11 @@ pipeline {
             post {
                 success {
                     echo 'Gradle build success'
-                    slackSend(channel: SLACK_CHANNEL, message: "✅ Gradle build succeeded for Build #${env.BUILD_NUMBER}.")
+                    slackSend(channel: SLACK_CHANNEL, message: "✅ GATEWAY build succeeded for Build #${env.BUILD_NUMBER}.")
                 }
                 failure {
                     echo 'Gradle build failed'
-                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ Gradle build failed for Build #${env.BUILD_NUMBER}.")
+                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ GATEWAY build failed for Build #${env.BUILD_NUMBER}.")
                 }
             }
         }
@@ -90,7 +80,7 @@ pipeline {
                                 docker compose ps
                             '
                         """
-                        slackSend(channel: SLACK_CHANNEL, message: "🚀 Deployment SUCCEED for Build #${env.BUILD_NUMBER}.")
+                        slackSend(channel: SLACK_CHANNEL, message: "🚀 GATEWAY Deployment SUCCEED for Build #${env.BUILD_NUMBER}.")
                     }
                 }
             }
@@ -99,16 +89,9 @@ pipeline {
                     echo "Deployment completed successfully."
                 }
                 failure {
-                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ Deployment FAILED for Build #${env.BUILD_NUMBER}.")
+                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ GATEWAY Deployment FAILED for Build #${env.BUILD_NUMBER}.")
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'This will always run after the build.'
-            // 추가적인 작업이 필요하다면 여기에 작성할 수 있습니다.
         }
     }
 }
