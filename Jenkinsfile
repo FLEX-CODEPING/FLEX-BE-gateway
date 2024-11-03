@@ -17,25 +17,29 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                script {
+                    checkout scm
+                }
             }
             post {
                 success {
                     echo "Successfully Cloned Repository"
+                    slackSend(channel: SLACK_CHANNEL, message: "✅ Successfully cloned repository for Build #${env.BUILD_NUMBER}.")
                 }
                 failure {
                     echo "Failed to Clone Repository"
+                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ Failed to clone repository for Build #${env.BUILD_NUMBER}.")
                 }
             }
         }
 
         stage('Build') {
-             script {
-                   slackSend(channel: SLACK_CHANNEL, message: "🏗️ GATEWAY Build #${env.BUILD_NUMBER} is starting...")
-             }
             steps {
-                sh 'chmod +x gradlew'
-                sh './gradlew clean assemble -x test'
+                script {
+                    slackSend(channel: SLACK_CHANNEL, message: "🏗️ GATEWAY Build #${env.BUILD_NUMBER} is starting...")
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean assemble -x test'
+                }
             }
             post {
                 success {
@@ -57,6 +61,7 @@ pipeline {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
+                    slackSend(channel: SLACK_CHANNEL, message: "🐳 Docker image built and pushed for Build #${env.BUILD_NUMBER}.")
                 }
             }
         }
@@ -64,31 +69,34 @@ pipeline {
         stage('Deploy to Remote Server') {
             steps {
                 sshagent(credentials: ['flex-server-pem']) {  // PEM 키를 사용하여 SSH 인증
-                    sh """
-                        ssh -J ${REMOTE_USER}@${BASTION_HOST} ${REMOTE_USER}@${REMOTE_HOST} '
-                            set -e
+                    script {
+                        sh """
+                            ssh -J ${REMOTE_USER}@${BASTION_HOST} ${REMOTE_USER}@${REMOTE_HOST} '
+                                set -e
 
-                            # 환경 변수 설정
-                            export IMAGE_TAG=${IMAGE_TAG}
+                                # 환경 변수 설정
+                                export IMAGE_TAG=${IMAGE_TAG}
 
-                            docker compose down --remove-orphans
+                                docker compose down --remove-orphans
 
-                            # Docker Compose 파일에 IMAGE_TAG 적용
-                            sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" docker-compose.yml
+                                # Docker Compose 파일에 IMAGE_TAG 적용
+                                sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" docker-compose.yml
 
-                            docker compose pull
-                            docker compose up -d
+                                docker compose pull
+                                docker compose up -d
 
-                            docker image prune -f
+                                docker image prune -f
 
-                            docker compose ps
-                        '
-                    """
+                                docker compose ps
+                            '
+                        """
+                        slackSend(channel: SLACK_CHANNEL, message: "🚀 Deployment SUCCEED for Build #${env.BUILD_NUMBER}.")
+                    }
                 }
             }
             post {
                 success {
-                    slackSend(channel: SLACK_CHANNEL, message: "🚀 Deployment SUCCEED for Build #${env.BUILD_NUMBER}.")
+                    echo "Deployment completed successfully."
                 }
                 failure {
                     slackSend(channel: SLACK_CHANNEL, message: "⛔️ Deployment FAILED for Build #${env.BUILD_NUMBER}.")
@@ -97,4 +105,10 @@ pipeline {
         }
     }
 
+    post {
+        always {
+            echo 'This will always run after the build.'
+            // 추가적인 작업이 필요하다면 여기에 작성할 수 있습니다.
+        }
+    }
 }
