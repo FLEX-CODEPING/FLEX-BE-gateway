@@ -6,6 +6,9 @@ pipeline {
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
         GITHUB_TOKEN = credentials('github-access-token')
         SSH_CREDENTIALS = credentials('flex-server-pem')
+        REMOTE_USER = credentials('remote-user')
+        BASTION_HOST = credentials('bastion-host')
+        REMOTE_HOST = credentials('dev-gateway-host')
         IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
@@ -56,7 +59,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['flex-server-pem']) {  // PEM 키를 사용하여 SSH 인증
                     sh """
-                        ssh flex-dev-gateway '
+                        ssh -J ${REMOTE_USER}@${BASTION_HOST} ${REMOTE_USER}@${REMOTE_HOST} '
                             set -e
 
                             # 환경 변수 설정
@@ -65,7 +68,7 @@ pipeline {
                             docker compose down --remove-orphans
 
                             # Docker Compose 파일에 IMAGE_TAG 적용
-                            sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' docker-compose.yml
+                            sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" docker-compose.yml
 
                             docker compose pull
                             docker compose up -d
@@ -80,9 +83,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo "Pipeline completed."
-        }
-    }
 }
