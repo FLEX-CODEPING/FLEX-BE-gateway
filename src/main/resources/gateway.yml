@@ -89,10 +89,11 @@ spring:
           '[/**]':
             allowedOrigins:
               - "http://localhost:3000"
-              - "http://dev.do-flex.co.kr:8080"
-              - "http://dev.do-flex.co.kr:8081"
-              - "http://do-flex.co.kr:3000"
+              - "http://${DEV_GATEWAY_HOST}:8080"
+              - "http://${DEV_GATEWAY_HOST}:8081"
+              - "http://${DEV_WEB_HOST}:3000"
               - ${AI_SERVER_URL}
+              - ${NGROK_SERVER_URL}
             allowedMethods:
               - GET
               - POST
@@ -115,7 +116,7 @@ spring:
         corsConfigurations:
           '[/**]':
             allowedOrigins:
-              - "https://prod.do-flex.co.kr"
+              - "https://do-flex.co.kr"
               - ${AI_SERVER_URL}
             allowedMethods:
               - GET
