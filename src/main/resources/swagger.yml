@@ -15,7 +15,7 @@ springdoc:
         url: /api/blog-service/v3/api-docs
       - name: 모의 투자 서비스
         url: /api/investment-service/v3/api-docs
-      - name: 주가 종목 서비스
+      - name: 주식 종목 서비스
         url: /api/stock-service/v3/api-docs
       - name: 이미지 서비스
         url: /api/image-service/v3/api-docs
