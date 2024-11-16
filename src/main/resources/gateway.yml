@@ -19,14 +19,14 @@ spring:
           uri: lb://blog-service
           predicates:
             - Path=/api/blogs/**, /api/posts/**, /api/follow/**, /api/blog-service/**
-        - id: investment-service
-          uri: lb://investment-service
-          predicates:
-            - Path=/api/investments/**, /api/investment-service/**
         - id: stock-service
           uri: lb://stock-service
           predicates:
             - Path=/api/stocks/**, /api/stock-service/**
+        - id: investment-service
+          uri: lb://investment-service
+          predicates:
+            - Path=/api/investments/**, /api/investment-service/**
         - id: image-service
           uri: lb://image-service
           predicates:
