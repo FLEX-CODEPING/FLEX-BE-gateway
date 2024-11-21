@@ -7,7 +7,11 @@ public class WebSecurityUrl {
     }
 
     protected static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico"};
-    protected static final String[] ANONYMOUS_ENDPOINTS = {"/api/auth/login/**", "/api/auth/signup/**", "/api/blogs/landings/**"};
+    protected static final String[] ANONYMOUS_ENDPOINTS = {
+            "/api/auth/login/**",
+            "/api/auth/signup/**",
+            "/api/blogs/landings/**",
+            "/api/users/checkBlogName"};
     protected static final String[] EXCLUDE_TOKEN_VALIDATION = {"/api/auth/reissue"};
     protected static final String[] SWAGGER_ENDPOINTS = {
             "/api/v3/api-docs/**",
