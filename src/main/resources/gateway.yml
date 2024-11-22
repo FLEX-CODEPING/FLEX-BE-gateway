@@ -54,6 +54,7 @@ management:
 
 ---
 spring.config.activate.on-profile: local
+
 spring:
   cloud:
     gateway:
@@ -64,7 +65,6 @@ spring:
               - "http://localhost:3000"
               - "http://localhost:8080"
               - "http://localhost:8081"
-              - "http://localhost:40020"
             allowedMethods:
               - GET
               - POST
@@ -81,6 +81,7 @@ logging:
 
 ---
 spring.config.activate.on-profile: dev
+
 spring:
   cloud:
     gateway:
@@ -92,7 +93,6 @@ spring:
               - "http://${DEV_GATEWAY_HOST}:8080"
               - "http://${DEV_GATEWAY_HOST}:8081"
               - "http://${DEV_WEB_HOST}:3000"
-              - ${AI_SERVER_URL}
               - ${NGROK_SERVER_URL}
             allowedMethods:
               - GET
@@ -102,6 +102,7 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             allowCredentials: true
+
 logging:
   level:
     root: INFO
@@ -109,6 +110,7 @@ logging:
 
 ---
 spring.config.activate.on-profile: prod
+
 spring:
   cloud:
     gateway:
@@ -116,8 +118,7 @@ spring:
         corsConfigurations:
           '[/**]':
             allowedOrigins:
-              - "https://do-flex.co.kr"
-              - ${AI_SERVER_URL}
+              - "https://do-flex.co.kr"  # 프로덕션 도메인 추가
             allowedMethods:
               - GET
               - POST
