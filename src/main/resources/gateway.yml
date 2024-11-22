@@ -118,7 +118,9 @@ spring:
         corsConfigurations:
           '[/**]':
             allowedOrigins:
-              - "https://do-flex.co.kr"  # 프로덕션 도메인 추가
+              - "https://do-flex.co.kr"
+              - "http://${PROD_GATEWAY_HOST}:${APPLICATION_PORT}"
+              - "http://${PROD_GATEWAY_HOST}:${USER_SERVICE_PORT}"
             allowedMethods:
               - GET
               - POST
