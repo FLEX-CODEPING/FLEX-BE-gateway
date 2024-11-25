@@ -10,7 +10,8 @@ public class WebSecurityUrl {
     protected static final String[] ANONYMOUS_ENDPOINTS = {
             "/api/auth/login/**",
             "/api/auth/signup/**",
-            "/api/blogs/landings/**",
+            "/api/blogs/landings/latest",
+            "/api/blogs/landings/popular",
             "/api/users/checkBlogName"};
     protected static final String[] EXCLUDE_TOKEN_VALIDATION = {"/api/auth/reissue"};
     protected static final String[] SWAGGER_ENDPOINTS = {
@@ -24,6 +25,7 @@ public class WebSecurityUrl {
             "/api/news-service/openapi.json",
             "/api/stock-service/v3/api-docs",
             "/api/investment-service/v3/api-docs",
+            "/api/stock-integration-service/v3/api-docs",
             "/api/image-service/v3/api-docs"
     };
 
