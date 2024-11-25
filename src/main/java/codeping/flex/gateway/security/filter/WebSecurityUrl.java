@@ -26,6 +26,7 @@ public class WebSecurityUrl {
             "/api/stock-service/v3/api-docs",
             "/api/investment-service/v3/api-docs",
             "/api/stock-integration-service/v3/api-docs",
+            "/api/stock-integration-service/openapi.json",
             "/api/image-service/v3/api-docs"
     };
 

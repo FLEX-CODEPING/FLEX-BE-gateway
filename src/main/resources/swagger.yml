@@ -20,7 +20,7 @@ springdoc:
       - name: 이미지 서비스
         url: /api/image-service/v3/api-docs
       - name: KIS Open API 서비스
-        url: /api/stock-integration-service/v3/api-docs
+        url: /api/stock-integration-service/openapi.json
       - name: AI 뉴스 요약 서비스
         url: /api/news-service/openapi.json
 
