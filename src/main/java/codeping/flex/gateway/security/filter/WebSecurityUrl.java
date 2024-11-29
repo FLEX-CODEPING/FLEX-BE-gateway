@@ -12,7 +12,11 @@ public class WebSecurityUrl {
             "/api/auth/signup/**",
             "/api/blogs/landings/latest",
             "/api/blogs/landings/popular",
-            "/api/users/checkBlogName"};
+            "/api/users/checkBlogName",
+            "/api/kis/stocks/ranking/**",
+            "/api/news-summary/todaynews"
+
+    };
     protected static final String[] EXCLUDE_TOKEN_VALIDATION = {"/api/auth/reissue"};
     protected static final String[] SWAGGER_ENDPOINTS = {
             "/api/v3/api-docs/**",
