@@ -14,7 +14,7 @@ public class WebSecurityUrl {
             "/api/blogs/landings/popular",
             "/api/users/checkBlogName",
             "/api/kis/stocks/ranking/**",
-            "/api/news/today"
+            "/api/news-summary/todaynews"
 
     };
     protected static final String[] EXCLUDE_TOKEN_VALIDATION = {"/api/auth/reissue"};
