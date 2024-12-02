@@ -18,7 +18,7 @@ springdoc:
       - name: 주식 종목 서비스
         url: /api/stock-service/v3/api-docs
       - name: 이미지 서비스
-        url: /api/image-service/v3/api-docs
+        url: /api/image-service/openapi.json
       - name: KIS Open API 서비스
         url: /api/stock-integration-service/openapi.json
       - name: AI 뉴스 요약 서비스
