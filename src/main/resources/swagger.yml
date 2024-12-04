@@ -23,6 +23,8 @@ springdoc:
         url: /api/stock-integration-service/openapi.json
       - name: AI 뉴스 요약 서비스
         url: /api/news-service/openapi.json
+      - name: 주식 예측 & 백테스팅 서비스
+        url: /api/stock-test-service/openapi.json
 
     persistAuthorization: true
   api-docs:

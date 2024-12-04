@@ -31,7 +31,8 @@ public class WebSecurityUrl {
             "/api/investment-service/v3/api-docs",
             "/api/stock-integration-service/v3/api-docs",
             "/api/stock-integration-service/openapi.json",
-            "/api/image-service/openapi.json"
+            "/api/image-service/openapi.json",
+            "/api/stock-test-service/openapi.json"
     };
 
     protected static final String PASSPORT_ENDPOINT = "/api/passport";
