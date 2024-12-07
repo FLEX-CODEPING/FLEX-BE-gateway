@@ -6,11 +6,8 @@ pipeline {
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
         GITHUB_TOKEN = credentials('github-access-token')
         SSH_CREDENTIALS = credentials('flex-server-pem')
-        REMOTE_USER = credentials('remote-user')
-        BASTION_HOST = credentials('bastion-host')
-        REMOTE_HOST = credentials('dev-gateway-host')
-        SLACK_CHANNEL = '#backend-jenkins'  // 채널 이름 수정
-        IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
+        SLACK_CHANNEL = '#backend-jenkins'
+        IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-prod-gateway"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -56,40 +53,24 @@ pipeline {
             }
         }
 
-        stage('Deploy to Remote Server') {
+ stage('Update Helm Values YAML') {
             steps {
-                sshagent(credentials: ['flex-server-pem']) {  // PEM 키를 사용하여 SSH 인증
-                    script {
+                script {
+                    slackSend(channel: SLACK_CHANNEL, message: "🔄 Updating Helm values for Build #${env.BUILD_NUMBER}...")
+                    git branch: 'main', credentialsId: 'github-signin', url: 'https://github.com/FLEX-CODEPING/FLEX-CD.git'
+                    sh """
+                    sed -i 's|tag: .*|tag: ${IMAGE_TAG}|' charts/auth-service/values.yaml
+                    """
+                    withCredentials([usernamePassword(credentialsId: 'github-signin', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         sh """
-                            ssh -J ${REMOTE_USER}@${BASTION_HOST} ${REMOTE_USER}@${REMOTE_HOST} '
-                                set -e
-
-                                # 환경 변수 설정
-                                export IMAGE_TAG=${IMAGE_TAG}
-
-                                docker compose down --remove-orphans
-
-                                # Docker Compose 파일에 IMAGE_TAG 적용
-                                sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" docker-compose.yml
-
-                                docker compose pull
-                                docker compose up -d
-
-                                docker image prune -f
-
-                                docker compose ps
-                            '
+                        git config user.email "kiwijiomn@gmail.com"
+                        git config user.name "kiwijiomn"
+                        git add charts/gateway-service/values.yaml
+                        git commit -m "[UPDATE] auth-service image tag ${IMAGE_TAG}"
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FLEX-CODEPING/FLEX-CD.git main
                         """
-                        slackSend(channel: SLACK_CHANNEL, message: "🚀 GATEWAY Deployment SUCCEED for Build #${env.BUILD_NUMBER}.")
                     }
-                }
-            }
-            post {
-                success {
-                    echo "Deployment completed successfully."
-                }
-                failure {
-                    slackSend(channel: SLACK_CHANNEL, message: "⛔️ GATEWAY Deployment FAILED for Build #${env.BUILD_NUMBER}.")
+                    slackSend(channel: SLACK_CHANNEL, message: "✅ Helm values.yaml updated for Build #${env.BUILD_NUMBER}.")
                 }
             }
         }
