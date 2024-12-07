@@ -61,10 +61,10 @@ pipeline {
                     sh """
                     sed -i 's|tag: .*|tag: ${IMAGE_TAG}|' charts/gateway-service/values.yaml
                     """
-                    withCredentials([usernamePassword(credentialsId: 'github-signin', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'github-access-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         sh """
-                        git config user.email "kiwijiomn@gmail.com"
-                        git config user.name "kiwijiomn"
+                        git config user.email "codepingkea@gmail.com"
+                        git config user.name "${GIT_USERNAME}"
                         git add charts/gateway-service/values.yaml
                         git commit -m "[UPDATE] gateway-service image tag ${IMAGE_TAG}"
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FLEX-CODEPING/FLEX-CD.git main
