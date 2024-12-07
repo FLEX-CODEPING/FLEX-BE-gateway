@@ -6,11 +6,8 @@ pipeline {
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
         GITHUB_TOKEN = credentials('github-access-token')
         SSH_CREDENTIALS = credentials('flex-server-pem')
-        REMOTE_USER = credentials('remote-user')
-        BASTION_HOST = credentials('bastion-host')
-        REMOTE_HOST = credentials('dev-gateway-host')
         SLACK_CHANNEL = '#backend-jenkins'
-        IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-gateway"
+        IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-prod-gateway"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -68,9 +65,9 @@ pipeline {
                         sh """
                         git config user.email "kiwijiomn@gmail.com"
                         git config user.name "kiwijiomn"
-                        git add charts/auth-service/values.yaml
+                        git add charts/gateway-service/values.yaml
                         git commit -m "[UPDATE] auth-service image tag ${IMAGE_TAG}"
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/KEA-Lucky7/MOABOA-GitOps.git main
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FLEX-CODEPING/FLEX-CD.git main
                         """
                     }
                     slackSend(channel: SLACK_CHANNEL, message: "✅ Helm values.yaml updated for Build #${env.BUILD_NUMBER}.")
