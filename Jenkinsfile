@@ -59,14 +59,14 @@ pipeline {
                     slackSend(channel: SLACK_CHANNEL, message: "🔄 Updating Helm values for Build #${env.BUILD_NUMBER}...")
                     git branch: 'main', credentialsId: 'github-signin', url: 'https://github.com/FLEX-CODEPING/FLEX-CD.git'
                     sh """
-                    sed -i 's|tag: .*|tag: ${IMAGE_TAG}|' charts/auth-service/values.yaml
+                    sed -i 's|tag: .*|tag: ${IMAGE_TAG}|' charts/gateway-service/values.yaml
                     """
                     withCredentials([usernamePassword(credentialsId: 'github-signin', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         sh """
                         git config user.email "kiwijiomn@gmail.com"
                         git config user.name "kiwijiomn"
                         git add charts/gateway-service/values.yaml
-                        git commit -m "[UPDATE] auth-service image tag ${IMAGE_TAG}"
+                        git commit -m "[UPDATE] gateway-service image tag ${IMAGE_TAG}"
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FLEX-CODEPING/FLEX-CD.git main
                         """
                     }
