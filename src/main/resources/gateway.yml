@@ -5,26 +5,52 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       routes:
         - id: user-service
-          uri: http://localhost:8081
+          uri: lb://user-service
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/follow
-          filters:
-            - StripPrefix=2
+            - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
         - id: blog-service
-          uri: http://localhost:8082
+          uri: lb://blog-service
           predicates:
-            - Path=/api/blogs/**, /api/posts/**
-          filters:
-            - StripPrefix=2
+            - Path=/api/blogs/**, /api/posts/**, /api/follow/**, /api/blog-service/**
+        - id: stock-service
+          uri: lb://stock-service
+          predicates:
+            - Path=/api/stocks/**, /api/interestStocks/**, /api/stock-service/**
         - id: investment-service
-          uri: http://localhost:8083
+          uri: lb://investment-service
           predicates:
-            - Path=/api/investments/**, /api/stocks/**, /api/my-stocks/**, /api/transactions/**
-          filters:
-            - StripPrefix=2
-
+            - Path=/api/investments/**, /api/investment-service/**, /api/hold-stocks/**, /api/transactions/**
+        - id: stock-integration-service
+          uri: lb://stock-integration-service
+          predicates:
+            - Path=/api/kis/stocks/**, /api/stock-integration-service/**
+        - id: stock-test-service
+          uri: lb://stock-test-service
+          predicates:
+            - Path=/api/back-test/**, /api/stock-predictions/**, /api/stock-test-service/**
+        - id: image-service
+          uri: lb://image-service
+          predicates:
+            - Path=/api/presigned-url/**, /api/image-service/**
+        - id: news-service
+          uri: lb://news-service
+          predicates:
+            - Path=/api/news-summary/**, /api/news-service/**
+      management:
+        endpoints:
+          web:
+            exposure:
+              include: '*'
+        endpoint:
+          gateway:
+            enabled: true
 management:
   endpoints:
     web:
@@ -37,11 +63,81 @@ management:
 ---
 spring.config.activate.on-profile: local
 
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:8080"
+              - "http://localhost:8081"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
 
 ---
 spring.config.activate.on-profile: dev
 
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://${DEV_GATEWAY_HOST}:8080"
+              - "http://${DEV_GATEWAY_HOST}:8081"
+              - "http://${DEV_WEB_HOST}:3000"
+              - ${NGROK_SERVER_URL}
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
 
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
 
 ---
 spring.config.activate.on-profile: prod
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://do-flex.co.kr"
+              - "http://${PROD_GATEWAY_HOST}:${APPLICATION_PORT}"
+              - "http://${PROD_GATEWAY_HOST}:${USER_SERVICE_PORT}"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
+            allowCredentials: true
+
+logging:
+  level:
+    root: WARN
+    org.springframework.cloud.gateway: INFO

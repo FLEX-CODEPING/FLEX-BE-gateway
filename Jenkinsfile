@@ -53,7 +53,7 @@ pipeline {
             }
         }
 
-        stage('Update Helm Values YAML') {
+ stage('Update Helm Values YAML') {
             steps {
                 script {
                     slackSend(channel: SLACK_CHANNEL, message: "🔄 Updating Helm values for Build #${env.BUILD_NUMBER}...")

@@ -1,0 +1,14 @@
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration-time:
+    access-token: ${JWT_ACCESS_EXPIRATION:1209600}
+    refresh-token: ${JWT_REFRESH_EXPIRATION:1800}
+
+---
+spring.config.activate.on-profile: local
+
+---
+spring.config.activate.on-profile: dev
+
+---
+spring.config.activate.on-profile: prod

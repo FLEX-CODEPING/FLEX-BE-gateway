@@ -1,0 +1,55 @@
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /api/swagger-ui.html
+    use-root-path: true
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+    disable-swagger-default-url: true
+    urls:
+      - name: 인증 & 회원서비스
+        url: /api/user-service/v3/api-docs
+      - name: 블로그 서비스
+        url: /api/blog-service/v3/api-docs
+      - name: 모의 투자 서비스
+        url: /api/investment-service/v3/api-docs
+      - name: 주식 종목 서비스
+        url: /api/stock-service/v3/api-docs
+      - name: 이미지 서비스
+        url: /api/image-service/openapi.json
+      - name: KIS Open API 서비스
+        url: /api/stock-integration-service/openapi.json
+      - name: AI 뉴스 요약 서비스
+        url: /api/news-service/openapi.json
+      - name: 주식 예측 & 백테스팅 서비스
+        url: /api/stock-test-service/openapi.json
+
+    persistAuthorization: true
+  api-docs:
+    path: /api/v3/api-docs
+  enable-spring-security: true
+
+  # 전역 보안 스키마 설정
+  components:
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  security:
+    - bearerAuth: []
+
+---
+spring.config.activate.on-profile: local
+
+swagger.server.url: http://localhost:8080
+
+---
+spring.config.activate.on-profile: dev
+
+swagger.server.url: ${SWAGGER_SERVER_URL}
+
+---
+spring.config.activate.on-profile: prod
