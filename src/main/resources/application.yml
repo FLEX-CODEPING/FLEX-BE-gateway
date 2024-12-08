@@ -32,11 +32,16 @@ spring:
     import:
       - eureka.yml
       - env.properties
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
 logging:
   level:
     root: INFO
     com.netflix.discovery: DEBUG
     org.springframework.cloud.netflix.eureka: DEBUG
+
 
 ---
 
@@ -45,6 +50,10 @@ spring:
   config:
     import:
       - eureka.yml
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
 logging:
   level:
     root: INFO
