@@ -45,6 +45,9 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
+
+    // Kubernetes
+    implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client'
 }
 
 dependencyManagement {

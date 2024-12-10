@@ -32,6 +32,10 @@ spring:
     import:
       - eureka.yml
       - env.properties
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
 logging:
   level:
     root: INFO
@@ -45,6 +49,10 @@ spring:
   config:
     import:
       - eureka.yml
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
 logging:
   level:
     root: INFO
@@ -68,5 +76,5 @@ eureka:
   instance:
     prefer-ip-address: true
   discovery:
-    enabled: false
+    enabled: true
 
