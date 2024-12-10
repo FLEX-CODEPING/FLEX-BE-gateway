@@ -13,7 +13,7 @@ public class WebSecurityUrl {
             "/api/blogs/landings/latest",
             "/api/blogs/landings/popular",
             "/api/users/checkBlogName",
-            "/api/kis/stocks/ranking/**",
+            "/api/kis/stocks/**",
             "/api/news-summary/todaynews"
 
     };
