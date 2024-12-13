@@ -42,7 +42,6 @@ logging:
     com.netflix.discovery: DEBUG
     org.springframework.cloud.netflix.eureka: DEBUG
 
-
 ---
 
 spring.config.activate.on-profile: dev
@@ -69,7 +68,6 @@ spring:
     kubernetes:
       discovery:
         enabled: true
-        all-namespaces: true
 
 eureka:
   client:
