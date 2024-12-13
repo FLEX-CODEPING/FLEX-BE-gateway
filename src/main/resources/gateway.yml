@@ -122,6 +122,13 @@ spring.config.activate.on-profile: prod
 spring:
   cloud:
     gateway:
+      discovery:
+        locator:
+          kubernetes:
+            enabled: true
+            allNamespaces: true
+            lower-case-service-id: true
+            health-check-enabled: true
       globalcors:
         corsConfigurations:
           '[/**]':
