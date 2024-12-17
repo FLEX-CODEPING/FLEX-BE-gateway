@@ -14,8 +14,8 @@ public class WebSecurityUrl {
             "/api/blogs/landings/popular",
             "/api/users/checkBlogName",
             "/api/kis/stocks/**",
-            "/api/news-summary/todaynews"
-
+            "/api/news-summary/todaynews",
+            "/api/transactions/rankings"
     };
     protected static final String[] INTERNAL_ENDPOINTS = {
             "/api/kis/stocks/**",
