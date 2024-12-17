@@ -125,7 +125,7 @@ spring:
       discovery:
       routes:
         - id: user-service
-          uri: lb://user-service
+          uri: ${USER_SERVICE_URI}
           predicates:
             - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
       locator:
