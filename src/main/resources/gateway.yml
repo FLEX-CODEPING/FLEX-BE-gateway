@@ -123,6 +123,11 @@ spring:
   cloud:
     gateway:
       discovery:
+      routes:
+        - id: user-service
+          uri: http://user-service.user-service.svc.cluster.local:${USER_SERVICE_PORT}
+          predicates:
+            - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
         locator:
           kubernetes:
             enabled: true
