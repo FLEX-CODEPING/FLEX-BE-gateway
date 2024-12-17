@@ -68,7 +68,6 @@ spring:
     kubernetes:
       discovery:
         enabled: true
-        all-namespaces: false
 
 eureka:
   client:
