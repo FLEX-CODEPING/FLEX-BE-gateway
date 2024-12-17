@@ -68,6 +68,8 @@ spring:
     kubernetes:
       discovery:
         enabled: true
+      client:
+        gateway-service
 
 eureka:
   client:
