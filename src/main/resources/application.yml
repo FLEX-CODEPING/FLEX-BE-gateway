@@ -75,5 +75,9 @@ eureka:
   instance:
     prefer-ip-address: true
   discovery:
-    enabled: true
+    enabled: false
+
+logging:
+  level:
+    org.springframework.cloud.kubernetes: DEBUG
 

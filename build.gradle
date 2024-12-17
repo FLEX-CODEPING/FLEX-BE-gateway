@@ -46,8 +46,11 @@ dependencies {
 
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 
-    // Kubernetes
+    // Kubernetes Client
     implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client'
+
+    // Kubernetes Discovery
+    implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-fabric8-discovery'
 }
 
 dependencyManagement {
