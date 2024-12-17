@@ -75,5 +75,5 @@ eureka:
   instance:
     prefer-ip-address: true
   discovery:
-    enabled: false
+    enabled: true
 

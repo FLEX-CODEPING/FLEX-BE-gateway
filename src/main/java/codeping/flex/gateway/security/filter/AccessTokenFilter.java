@@ -103,6 +103,7 @@ public class AccessTokenFilter implements GlobalFilter {
      */
     private boolean isAnonymousEndpoint(String path) {
         return Stream.of(
+                WebSecurityUrl.INTERNAL_ENDPOINTS,
             WebSecurityUrl.READ_ONLY_PUBLIC_ENDPOINTS, WebSecurityUrl.ANONYMOUS_ENDPOINTS, WebSecurityUrl.SWAGGER_ENDPOINTS
             )
             .flatMap(Arrays::stream)

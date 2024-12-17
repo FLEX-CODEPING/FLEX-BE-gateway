@@ -26,7 +26,7 @@ spring:
         - id: investment-service
           uri: lb://investment-service
           predicates:
-            - Path=/api/investments/**, /api/investment-service/**, /api/hold-stocks/**, /api/transactions/**
+            - Path=/api/investments/**, /api/investment-service/**, /api/hold-stocks/**, /api/transactions/**, /api/investment-analysis/**
         - id: stock-integration-service
           uri: lb://stock-integration-service
           predicates:
