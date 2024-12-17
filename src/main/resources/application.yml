@@ -81,5 +81,8 @@ eureka:
 
 logging:
   level:
+    codeping.flex.gateway.security.filter.AccessTokenFilter: TRACE
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
     org.springframework.cloud.kubernetes: DEBUG
-
