@@ -48,9 +48,6 @@ dependencies {
 
     // Kubernetes Client
     implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client'
-
-    // Kubernetes Discovery
-    implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-fabric8-discovery'
 }
 
 dependencyManagement {
