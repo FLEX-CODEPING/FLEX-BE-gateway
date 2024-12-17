@@ -48,6 +48,9 @@ dependencies {
 
     // Kubernetes Client
     implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client'
+
+    // Loadbalnacer
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
 }
 
 dependencyManagement {
