@@ -128,12 +128,12 @@ spring:
           uri: http://user-service.user-service.svc.cluster.local:${USER_SERVICE_PORT}
           predicates:
             - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
-        locator:
-          kubernetes:
-            enabled: true
-            allNamespaces: true
-            lower-case-service-id: true
-            health-check-enabled: true
+      locator:
+        kubernetes:
+          enabled: true
+          allNamespaces: true
+          lower-case-service-id: true
+          health-check-enabled: true
       globalcors:
         corsConfigurations:
           '[/**]':
