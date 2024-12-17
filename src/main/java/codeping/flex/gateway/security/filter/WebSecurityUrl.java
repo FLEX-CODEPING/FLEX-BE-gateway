@@ -17,6 +17,10 @@ public class WebSecurityUrl {
             "/api/news-summary/todaynews"
 
     };
+    protected static final String[] INTERNAL_ENDPOINTS = {
+            "/api/kis/stocks/**",
+            "/api/stocks/image-url"
+    };
     protected static final String[] EXCLUDE_TOKEN_VALIDATION = {"/api/auth/reissue"};
     protected static final String[] SWAGGER_ENDPOINTS = {
             "/api/v3/api-docs/**",
