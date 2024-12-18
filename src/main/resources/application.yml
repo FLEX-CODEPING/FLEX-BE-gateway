@@ -25,6 +25,10 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.cloud.loadbalancer: DEBUG
 
+webclient:
+  user-service:
+    base-url: ${USER_SERVICE:http://USER-SERVICE}
+
 ---
 spring.config.activate.on-profile: local
 spring:

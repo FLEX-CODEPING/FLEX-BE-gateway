@@ -5,6 +5,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,9 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @Configuration
 public class WebClientConfig {
+
+    @Value("webclient.user-service.base-url")
+    private String userServiceBaseUrl;
 
     @Bean
     public ReactorResourceFactory resourceFactory() {
@@ -54,7 +58,7 @@ public class WebClientConfig {
     @Bean
     public WebClient userServiceClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .baseUrl("http://USER-SERVICE")
+                .baseUrl(userServiceBaseUrl)
                 .build();
     }
 }
