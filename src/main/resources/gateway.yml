@@ -154,4 +154,4 @@ spring:
 logging:
   level:
     root: WARN
-    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.gateway: DEBUG
