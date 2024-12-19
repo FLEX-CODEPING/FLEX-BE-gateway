@@ -125,11 +125,6 @@ spring:
       discovery:
         locator:
           enabled: true
-      routes:
-        - id: user-service
-          uri: ${USER_SERVICE_URI}
-          predicates:
-            - Path=/api/auth/**, /api/users/**, /api/passport/**, /api/user-service/**
       locator:
         kubernetes:
           enabled: true
