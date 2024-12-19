@@ -61,7 +61,7 @@ pipeline {
                     sh """
                     sed -i 's|tag: .*|tag: ${IMAGE_TAG}|' charts/gateway-service/values.yaml
                     """
-                    withCredentials([usernamePassword(credentialsId: 'github-access-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'github-access-token-credential', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         sh """
                         git config user.email "codepingkea@gmail.com"
                         git config user.name "${GIT_USERNAME}"
