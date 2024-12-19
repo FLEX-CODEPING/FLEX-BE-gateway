@@ -73,6 +73,8 @@ spring:
       discovery:
         enabled: true
         all-namespaces: true
+      loadbalancer:
+        mode: service
 
 eureka:
   client:
