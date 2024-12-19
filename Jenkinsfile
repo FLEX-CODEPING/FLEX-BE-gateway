@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS = credentials('docker-repo-credential')
         DOCKER_USERNAME = "${DOCKER_CREDENTIALS_USR}"
-        GITHUB_TOKEN = credentials('github-access-token')
+        GITHUB_TOKEN = credentials('github-access-token-credential')
         SSH_CREDENTIALS = credentials('flex-server-pem')
         SLACK_CHANNEL = '#backend-jenkins'
         IMAGE_NAME = "${DOCKER_USERNAME}/flex-be-prod-gateway"
