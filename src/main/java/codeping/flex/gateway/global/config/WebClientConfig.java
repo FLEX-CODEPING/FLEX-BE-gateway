@@ -25,7 +25,7 @@ import java.util.function.Function;
 @Configuration
 public class WebClientConfig {
 
-    @Value("webclient.user-service.base-url")
+    @Value("${webclient.user-service.base-url}")
     private String userServiceBaseUrl;
 
     @Bean
